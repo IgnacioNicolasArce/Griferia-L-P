@@ -16,6 +16,15 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '../frontend')));
 
+// Ruta de healthcheck para Railway
+app.get('/health', (req, res) => {
+  res.status(200).json({ 
+    status: 'OK', 
+    message: 'Grifería L&P API is running',
+    timestamp: new Date().toISOString()
+  });
+});
+
 // Rutas
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
