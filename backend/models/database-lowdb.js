@@ -99,7 +99,7 @@ const initDatabase = () => {
 };
 
 // Funciones de base de datos compatibles con SQLite
-const db = {
+const dbHelper = {
   get: (query) => {
     const [table, ...conditions] = query.split(' ');
     let result = db.get(table);
@@ -131,4 +131,4 @@ const db = {
   }
 };
 
-module.exports = { db, initDatabase };
+module.exports = { db: dbHelper, initDatabase };
