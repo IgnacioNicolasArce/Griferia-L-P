@@ -2,7 +2,7 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { body, validationResult } = require('express-validator');
-const { db } = require('../models/database-simple');
+const { db } = require('../models/database-fixed');
 const config = require('../config');
 
 const router = express.Router();
@@ -73,7 +73,7 @@ router.post('/register', [
 router.post('/login', [
   body('email').isEmail().withMessage('Email inválido'),
   body('password').notEmpty().withMessage('La contraseña es requerida')
-], (req, res) => {
+], async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
@@ -81,10 +81,9 @@ router.post('/login', [
 
   const { email, password } = req.body;
 
-  db.get('SELECT * FROM users WHERE email = ?', [email], (err, user) => {
-    if (err) {
-      return res.status(500).json({ message: 'Error del servidor' });
-    }
+  try {
+    const result = await db.get('SELECT * FROM users WHERE email = ?', [email]);
+    const user = result.value();
 
     if (!user || !bcrypt.compareSync(password, user.password)) {
       return res.status(401).json({ message: 'Credenciales inválidas' });
@@ -96,7 +95,10 @@ router.post('/login', [
       token,
       user: { id: user.id, name: user.name, email: user.email, role: user.role }
     });
-  });
+  } catch (error) {
+    console.error('Error en login:', error);
+    res.status(500).json({ message: 'Error del servidor' });
+  }
 });
 
 // Obtener perfil del usuario

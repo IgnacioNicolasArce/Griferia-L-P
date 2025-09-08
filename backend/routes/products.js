@@ -1,18 +1,19 @@
 const express = require('express');
 const { body, validationResult } = require('express-validator');
-const { db } = require('../models/database-simple');
+const { db } = require('../models/database-fixed');
 const { authenticateToken } = require('./auth');
 
 const router = express.Router();
 
 // Obtener todos los productos
-router.get('/', (req, res) => {
-  db.all('SELECT * FROM products ORDER BY created_at DESC', (err, products) => {
-    if (err) {
-      return res.status(500).json({ message: 'Error al obtener productos' });
-    }
+router.get('/', async (req, res) => {
+  try {
+    const products = await db.all('SELECT * FROM products ORDER BY created_at DESC');
     res.json(products);
-  });
+  } catch (error) {
+    console.error('Error al obtener productos:', error);
+    res.status(500).json({ message: 'Error al obtener productos' });
+  }
 });
 
 // Obtener producto por ID
