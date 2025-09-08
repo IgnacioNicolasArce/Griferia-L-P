@@ -6,7 +6,7 @@ const { authenticateToken } = require('./routes/auth');
 const productRoutes = require('./routes/products');
 const orderRoutes = require('./routes/orders');
 const contactRoutes = require('./routes/contact');
-const { initDatabase } = require('./models/database-fixed');
+const { initDatabase } = require('./models/database-render');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -23,6 +23,29 @@ app.get('/health', (req, res) => {
     message: 'Grifería L&P API is running',
     timestamp: new Date().toISOString()
   });
+});
+
+// Ruta de debug para verificar la base de datos
+app.get('/debug', async (req, res) => {
+  try {
+    const { db } = require('./models/database-render');
+    const products = await db.all('SELECT * FROM products');
+    const users = await db.all('SELECT * FROM users');
+    
+    res.json({
+      status: 'OK',
+      products: products,
+      users: users,
+      productsCount: products.length,
+      usersCount: users.length,
+      dbPath: process.env.NODE_ENV === 'production' ? '/tmp/db.json' : path.join(__dirname, '../../database/db.json')
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 'ERROR',
+      error: error.message
+    });
+  }
 });
 
 // Rutas
