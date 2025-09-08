@@ -6,7 +6,7 @@ const { authenticateToken } = require('./routes/auth');
 const productRoutes = require('./routes/products');
 const orderRoutes = require('./routes/orders');
 const contactRoutes = require('./routes/contact');
-const { initDatabase } = require('./models/database');
+const { initDatabase } = require('./models/database-lowdb');
 
 const app = express();
 const PORT = process.env.PORT || 3000;

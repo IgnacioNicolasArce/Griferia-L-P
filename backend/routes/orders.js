@@ -1,6 +1,6 @@
 const express = require('express');
 const { body, validationResult } = require('express-validator');
-const { db } = require('../models/database');
+const { db } = require('../models/database-lowdb');
 const { authenticateToken } = require('./auth');
 const nodemailer = require('nodemailer');
 const config = require('../config');
