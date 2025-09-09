@@ -48,6 +48,33 @@ app.get('/debug', async (req, res) => {
   }
 });
 
+// Ruta para forzar la inicialización de la base de datos
+app.get('/init-db', async (req, res) => {
+  try {
+    console.log('Forcing database initialization...');
+    await initDatabase();
+    
+    const { db } = require('./models/database-render');
+    const products = await db.all('SELECT * FROM products');
+    const users = await db.all('SELECT * FROM users');
+    
+    res.json({
+      status: 'SUCCESS',
+      message: 'Database initialized successfully',
+      products: products,
+      users: users,
+      productsCount: products.length,
+      usersCount: users.length
+    });
+  } catch (error) {
+    console.error('Error initializing database:', error);
+    res.status(500).json({
+      status: 'ERROR',
+      error: error.message
+    });
+  }
+});
+
 // Rutas
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
