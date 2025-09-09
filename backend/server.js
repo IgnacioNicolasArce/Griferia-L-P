@@ -53,11 +53,11 @@ app.get('/init-db', async (req, res) => {
   try {
     console.log('Forcing database initialization...');
     await initDatabase();
-    
+
     const { db } = require('./models/database-render');
     const products = await db.all('SELECT * FROM products');
     const users = await db.all('SELECT * FROM users');
-    
+
     res.json({
       status: 'SUCCESS',
       message: 'Database initialized successfully',
@@ -68,6 +68,34 @@ app.get('/init-db', async (req, res) => {
     });
   } catch (error) {
     console.error('Error initializing database:', error);
+    res.status(500).json({
+      status: 'ERROR',
+      error: error.message
+    });
+  }
+});
+
+// Ruta para probar el login del admin
+app.post('/test-login', async (req, res) => {
+  try {
+    const { db } = require('./models/database-render');
+    const email = 'admin@griferia.com';
+    
+    console.log('Testing admin login...');
+    const result = await db.get('SELECT * FROM users WHERE email = ?', [email]);
+    console.log('Test login result:', result);
+    const user = result.value();
+    console.log('Test login user:', user);
+    
+    res.json({
+      status: 'SUCCESS',
+      email: email,
+      user: user,
+      hasUser: !!user,
+      userRole: user ? user.role : 'none'
+    });
+  } catch (error) {
+    console.error('Error testing login:', error);
     res.status(500).json({
       status: 'ERROR',
       error: error.message
