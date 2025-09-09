@@ -83,10 +83,26 @@ router.post('/login', [
 
   try {
     console.log('Login attempt for email:', email);
-    const result = await db.get('SELECT * FROM users WHERE email = ?', [email]);
-    console.log('Login result:', result);
-    const user = result.value();
-    console.log('Login user:', user);
+    
+    // Leer la base de datos directamente
+    const fs = require('fs');
+    const path = require('path');
+    const dbPath = process.env.NODE_ENV === 'production' ? '/tmp/db.json' : path.join(__dirname, '../../database/db.json');
+    
+    let data;
+    try {
+      data = JSON.parse(fs.readFileSync(dbPath, 'utf8'));
+    } catch (err) {
+      console.error('Error reading database:', err);
+      return res.status(500).json({ message: 'Error del servidor' });
+    }
+    
+    console.log('Database data:', data);
+    const users = data.users || [];
+    console.log('Users:', users);
+    
+    const user = users.find(u => u.email === email);
+    console.log('Found user:', user);
 
     if (!user || !bcrypt.compareSync(password, user.password)) {
       console.log('Invalid credentials');
