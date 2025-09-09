@@ -10,12 +10,19 @@ const dbPath = process.env.NODE_ENV === 'production'
 // Función para leer la base de datos
 function readDB() {
   try {
+    console.log('Reading database from:', dbPath);
     if (fs.existsSync(dbPath)) {
       const data = fs.readFileSync(dbPath, 'utf8');
-      return JSON.parse(data);
+      console.log('Raw data from file:', data);
+      const parsed = JSON.parse(data);
+      console.log('Parsed data:', parsed);
+      return parsed;
+    } else {
+      console.log('Database file does not exist, using default data');
     }
   } catch (error) {
     console.error('Error reading database:', error);
+    console.error('Error details:', error.message);
   }
   
   // Base de datos por defecto
@@ -31,15 +38,28 @@ function readDB() {
 // Función para escribir la base de datos
 function writeDB(data) {
   try {
+    console.log('Writing database to:', dbPath);
+    console.log('Data to write:', JSON.stringify(data, null, 2));
+    
     // Asegurar que el directorio existe
     const dir = path.dirname(dbPath);
     if (!fs.existsSync(dir)) {
+      console.log('Creating directory:', dir);
       fs.mkdirSync(dir, { recursive: true });
     }
+    
+    // Escribir el archivo
     fs.writeFileSync(dbPath, JSON.stringify(data, null, 2));
     console.log('Database written successfully to:', dbPath);
+    
+    // Verificar que se escribió correctamente
+    const writtenData = fs.readFileSync(dbPath, 'utf8');
+    console.log('Verification - written data:', writtenData);
+    
   } catch (error) {
     console.error('Error writing database:', error);
+    console.error('Error details:', error.message);
+    console.error('Stack trace:', error.stack);
   }
 }
 
