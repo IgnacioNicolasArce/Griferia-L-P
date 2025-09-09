@@ -15,6 +15,16 @@ const cartModal = document.getElementById('cartModal');
 const productModal = document.getElementById('productModal');
 const productFormModal = document.getElementById('productFormModal');
 
+// Elementos del carrito
+const cartBtn = document.getElementById('cartBtn');
+const cartPanel = document.getElementById('cartPanel');
+const cartOverlay = document.getElementById('cartOverlay');
+const cartClose = document.getElementById('cartClose');
+const cartItems = document.getElementById('cartItems');
+const cartCount = document.getElementById('cartCount');
+const cartTotal = document.getElementById('cartTotal');
+const checkoutBtn = document.getElementById('checkoutBtn');
+
 // Formularios
 const loginForm = document.getElementById('loginForm');
 const registerForm = document.getElementById('registerForm');
@@ -44,6 +54,12 @@ function setupEventListeners() {
     registerBtn.addEventListener('click', () => showModal(registerModal));
     adminBtn.addEventListener('click', () => showModal(adminModal));
     logoutBtn.addEventListener('click', logout);
+    
+    // Carrito
+    cartBtn.addEventListener('click', toggleCart);
+    cartClose.addEventListener('click', closeCart);
+    cartOverlay.addEventListener('click', closeCart);
+    checkoutBtn.addEventListener('click', handleCheckout);
 
     // Formularios
     loginForm.addEventListener('submit', handleLogin);
@@ -700,6 +716,136 @@ function updateActiveNavLink(targetId) {
     if (activeLink) {
         activeLink.classList.add('active');
     }
+}
+
+// ==================== FUNCIONES DEL CARRITO ====================
+
+// Función para alternar el panel del carrito
+function toggleCart() {
+    cartPanel.classList.toggle('active');
+    cartOverlay.classList.toggle('active');
+    document.body.style.overflow = cartPanel.classList.contains('active') ? 'hidden' : '';
+}
+
+// Función para cerrar el panel del carrito
+function closeCart() {
+    cartPanel.classList.remove('active');
+    cartOverlay.classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+// Función para agregar producto al carrito
+function addToCart(productId) {
+    const product = products.find(p => p.id == productId);
+    if (!product) return;
+
+    const existingItem = cart.find(item => item.id == productId);
+    if (existingItem) {
+        existingItem.quantity += 1;
+    } else {
+        cart.push({
+            id: product.id,
+            name: product.name,
+            price: product.price,
+            image_url: product.image_url,
+            quantity: 1
+        });
+    }
+
+    updateCartUI();
+    showMessage('Producto agregado al carrito', 'success');
+}
+
+// Función para remover producto del carrito
+function removeFromCart(productId) {
+    cart = cart.filter(item => item.id != productId);
+    updateCartUI();
+    showMessage('Producto removido del carrito', 'success');
+}
+
+// Función para actualizar cantidad de producto en el carrito
+function updateCartQuantity(productId, newQuantity) {
+    const item = cart.find(item => item.id == productId);
+    if (item) {
+        if (newQuantity <= 0) {
+            removeFromCart(productId);
+        } else {
+            item.quantity = newQuantity;
+            updateCartUI();
+        }
+    }
+}
+
+// Función para actualizar la UI del carrito
+function updateCartUI() {
+    // Actualizar contador del carrito
+    const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+    cartCount.textContent = totalItems;
+
+    // Actualizar lista de productos
+    if (cart.length === 0) {
+        cartItems.innerHTML = `
+            <div class="cart-empty">
+                <i class="fas fa-shopping-cart"></i>
+                <p>Tu carrito está vacío</p>
+            </div>
+        `;
+        checkoutBtn.style.display = 'none';
+    } else {
+        cartItems.innerHTML = cart.map(item => `
+            <div class="cart-item">
+                <img src="${item.image_url || '/images/placeholder.jpg'}" alt="${item.name}" class="cart-item-image">
+                <div class="cart-item-details">
+                    <div class="cart-item-name">${item.name}</div>
+                    <div class="cart-item-price">$${item.price.toLocaleString()}</div>
+                    <div class="cart-item-quantity">
+                        <button class="quantity-btn" onclick="updateCartQuantity(${item.id}, ${item.quantity - 1})" ${item.quantity <= 1 ? 'disabled' : ''}>-</button>
+                        <input type="number" class="quantity-input" value="${item.quantity}" min="1" onchange="updateCartQuantity(${item.id}, parseInt(this.value))">
+                        <button class="quantity-btn" onclick="updateCartQuantity(${item.id}, ${item.quantity + 1})">+</button>
+                    </div>
+                </div>
+                <button class="cart-item-remove" onclick="removeFromCart(${item.id})">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+        `).join('');
+        checkoutBtn.style.display = 'block';
+    }
+
+    // Actualizar total
+    const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    cartTotal.textContent = total.toLocaleString();
+}
+
+// Función para manejar el checkout
+function handleCheckout() {
+    if (!currentUser) {
+        closeCart();
+        showModal(loginModal);
+        showMessage('Debes iniciar sesión para proceder al pago', 'error');
+        return;
+    }
+
+    if (cart.length === 0) {
+        showMessage('Tu carrito está vacío', 'error');
+        return;
+    }
+
+    // Aquí puedes implementar la lógica de checkout
+    // Por ahora, solo mostramos un mensaje
+    showMessage('Funcionalidad de checkout en desarrollo', 'success');
+    console.log('Checkout:', cart);
+}
+
+// Función para obtener el total del carrito
+function getCartTotal() {
+    return cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+}
+
+// Función para limpiar el carrito
+function clearCart() {
+    cart = [];
+    updateCartUI();
 }
 
 // Agregar botón de carrito al header
