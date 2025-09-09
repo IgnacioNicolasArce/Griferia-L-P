@@ -162,19 +162,30 @@ const db = {
   get: (query, params = []) => {
     return new Promise((resolve) => {
       try {
+        console.log('DB GET query:', query, 'params:', params);
         const data = readDB();
-        const [table, ...conditions] = query.split(' ');
+        console.log('DB GET data:', data);
         
-        if (conditions.includes('WHERE')) {
-          const whereIndex = conditions.indexOf('WHERE');
-          if (whereIndex !== -1 && whereIndex + 2 < conditions.length) {
-            const field = conditions[whereIndex + 1];
-            const operator = conditions[whereIndex + 2];
-            const value = conditions[whereIndex + 3];
+        // Parsear "SELECT * FROM table WHERE field = value"
+        const parts = query.split(' ');
+        const tableIndex = parts.indexOf('FROM');
+        const table = tableIndex !== -1 ? parts[tableIndex + 1] : parts[2];
+        
+        console.log('DB GET table:', table);
+        
+        if (parts.includes('WHERE')) {
+          const whereIndex = parts.indexOf('WHERE');
+          if (whereIndex !== -1 && whereIndex + 2 < parts.length) {
+            const field = parts[whereIndex + 1];
+            const operator = parts[whereIndex + 2];
+            const value = parts[whereIndex + 3] || params[0];
+            
+            console.log('DB GET WHERE:', { field, operator, value });
             
             if (operator === '=') {
               const items = data[table] || [];
               const result = items.find(item => item[field] == value);
+              console.log('DB GET result:', result);
               resolve({
                 value: () => result
               });
@@ -183,6 +194,7 @@ const db = {
           }
         }
         
+        console.log('DB GET no WHERE clause, returning null');
         resolve({
           value: () => null
         });
@@ -198,10 +210,18 @@ const db = {
   all: (query, params = []) => {
     return new Promise((resolve) => {
       try {
+        console.log('DB ALL query:', query);
         const data = readDB();
-        const [table] = query.split(' ');
+        console.log('DB ALL data:', data);
+        
+        // Parsear "SELECT * FROM table"
+        const parts = query.split(' ');
+        const tableIndex = parts.indexOf('FROM');
+        const table = tableIndex !== -1 ? parts[tableIndex + 1] : parts[2];
+        
+        console.log('DB ALL table:', table);
         const result = data[table] || [];
-        console.log(`Retrieved ${result.length} items from ${table}`);
+        console.log(`DB ALL Retrieved ${result.length} items from ${table}:`, result);
         resolve(result);
       } catch (error) {
         console.error('Error in db.all:', error);
