@@ -56,14 +56,44 @@ router.post('/', authenticateToken, [
     const { name, description, price, stock, image_url, category } = req.body;
     console.log('Creating product:', { name, description, price, stock, image_url, category });
 
-    const result = await db.run('INSERT INTO products (name, description, price, stock, image_url, category) VALUES (?, ?, ?, ?, ?, ?)',
-      [{ name, description, price, stock, image_url, category }]);
+    // Leer la base de datos directamente para crear
+    const fs = require('fs');
+    const path = require('path');
+    const dbPath = process.env.NODE_ENV === 'production' ? '/tmp/db.json' : path.join(__dirname, '../../database/db.json');
     
-    console.log('Product created with result:', result);
+    let data;
+    try {
+      data = JSON.parse(fs.readFileSync(dbPath, 'utf8'));
+    } catch (err) {
+      console.error('Error reading database:', err);
+      return res.status(500).json({ message: 'Error del servidor' });
+    }
+    
+    // Generar nuevo ID
+    const newId = data.products.length > 0 ? Math.max(...data.products.map(p => p.id)) + 1 : 1;
+    
+    // Crear el nuevo producto
+    const newProduct = {
+      id: newId,
+      name,
+      description,
+      price: parseFloat(price),
+      stock: parseInt(stock),
+      image_url,
+      category,
+      created_at: new Date().toISOString()
+    };
+    
+    // Agregar el producto a la base de datos
+    data.products.push(newProduct);
+    
+    // Guardar la base de datos
+    fs.writeFileSync(dbPath, JSON.stringify(data, null, 2));
+    console.log('Product created successfully with ID:', newId);
 
     res.status(201).json({ 
       message: 'Producto creado exitosamente',
-      product: { id: result.lastID, name, description, price, stock, image_url, category }
+      product: newProduct
     });
   } catch (error) {
     console.error('Error al crear producto:', error);
