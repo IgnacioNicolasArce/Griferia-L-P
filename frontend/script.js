@@ -848,10 +848,3 @@ function clearCart() {
     updateCartUI();
 }
 
-// Agregar botón de carrito al header
-document.addEventListener('DOMContentLoaded', () => {
-    const navMenu = document.querySelector('.nav-menu');
-    const cartButton = document.createElement('li');
-    cartButton.innerHTML = '<a href="#" class="nav-link" onclick="showCart()"><i class="fas fa-shopping-cart"></i> Carrito</a>';
-    navMenu.appendChild(cartButton);
-});
