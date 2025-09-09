@@ -55,82 +55,79 @@ const initDatabase = () => {
     try {
       console.log('Initializing database...');
       let data = readDB();
+      console.log('Current data:', data);
       
-      // Verificar si ya hay datos
-      if (data.users.length === 0) {
-        console.log('Creating initial data...');
-        
-        // Crear usuario admin por defecto
-        const adminPassword = bcrypt.hashSync('admin123', 10);
-        data.users.push({
+      // Siempre crear los datos iniciales (para debug)
+      console.log('Creating initial data...');
+      
+      // Crear usuario admin por defecto
+      const adminPassword = bcrypt.hashSync('admin123', 10);
+      data.users = [{
+        id: 1,
+        name: 'Admin',
+        email: 'admin@griferia.com',
+        password: adminPassword,
+        role: 'admin',
+        created_at: new Date().toISOString()
+      }];
+
+      // Insertar productos de ejemplo
+      data.products = [
+        {
           id: 1,
-          name: 'Admin',
-          email: 'admin@griferia.com',
-          password: adminPassword,
-          role: 'admin',
+          name: 'Grifo de Cocina Moderno',
+          description: 'Grifo de cocina con tecnología de ahorro de agua y diseño moderno',
+          price: 25000,
+          stock: 15,
+          image_url: '/images/grifo-cocina.jpg',
+          category: 'Cocina',
           created_at: new Date().toISOString()
-        });
+        },
+        {
+          id: 2,
+          name: 'Ducha de Lluvia',
+          description: 'Ducha de lluvia con múltiples chorros y regulador de temperatura',
+          price: 45000,
+          stock: 8,
+          image_url: '/images/ducha-lluvia.jpg',
+          category: 'Baño',
+          created_at: new Date().toISOString()
+        },
+        {
+          id: 3,
+          name: 'Lavamanos de Pedestal',
+          description: 'Lavamanos elegante de porcelana con grifo incluido',
+          price: 35000,
+          stock: 12,
+          image_url: '/images/lavamanos.jpg',
+          category: 'Baño',
+          created_at: new Date().toISOString()
+        },
+        {
+          id: 4,
+          name: 'Grifo de Baño',
+          description: 'Grifo de baño con acabado cromado y válvula de ahorro',
+          price: 18000,
+          stock: 20,
+          image_url: '/images/grifo-bano.jpg',
+          category: 'Baño',
+          created_at: new Date().toISOString()
+        },
+        {
+          id: 5,
+          name: 'Accesorio de Ducha',
+          description: 'Set completo de accesorios para ducha con porta jabón',
+          price: 12000,
+          stock: 25,
+          image_url: '/images/accesorios-ducha.jpg',
+          category: 'Accesorios',
+          created_at: new Date().toISOString()
+        }
+      ];
 
-        // Insertar productos de ejemplo
-        const products = [
-          {
-            id: 1,
-            name: 'Grifo de Cocina Moderno',
-            description: 'Grifo de cocina con tecnología de ahorro de agua y diseño moderno',
-            price: 25000,
-            stock: 15,
-            image_url: '/images/grifo-cocina.jpg',
-            category: 'Cocina',
-            created_at: new Date().toISOString()
-          },
-          {
-            id: 2,
-            name: 'Ducha de Lluvia',
-            description: 'Ducha de lluvia con múltiples chorros y regulador de temperatura',
-            price: 45000,
-            stock: 8,
-            image_url: '/images/ducha-lluvia.jpg',
-            category: 'Baño',
-            created_at: new Date().toISOString()
-          },
-          {
-            id: 3,
-            name: 'Lavamanos de Pedestal',
-            description: 'Lavamanos elegante de porcelana con grifo incluido',
-            price: 35000,
-            stock: 12,
-            image_url: '/images/lavamanos.jpg',
-            category: 'Baño',
-            created_at: new Date().toISOString()
-          },
-          {
-            id: 4,
-            name: 'Grifo de Baño',
-            description: 'Grifo de baño con acabado cromado y válvula de ahorro',
-            price: 18000,
-            stock: 20,
-            image_url: '/images/grifo-bano.jpg',
-            category: 'Baño',
-            created_at: new Date().toISOString()
-          },
-          {
-            id: 5,
-            name: 'Accesorio de Ducha',
-            description: 'Set completo de accesorios para ducha con porta jabón',
-            price: 12000,
-            stock: 25,
-            image_url: '/images/accesorios-ducha.jpg',
-            category: 'Accesorios',
-            created_at: new Date().toISOString()
-          }
-        ];
-
-        data.products = products;
-        writeDB(data);
-        console.log('Database initialized successfully with', products.length, 'products and 1 admin user');
-      } else {
-        console.log('Database already initialized');
-      }
+      console.log('Data to write:', data);
+      writeDB(data);
+      console.log('Database initialized successfully with', data.products.length, 'products and', data.users.length, 'users');
 
       resolve();
     } catch (error) {
