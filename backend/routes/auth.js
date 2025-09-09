@@ -40,10 +40,8 @@ router.post('/register', [
   const { name, email, password } = req.body;
 
   // Verificar si el usuario ya existe
-  db.get('SELECT * FROM users WHERE email = ?', [email], (err, user) => {
-    if (err) {
-      return res.status(500).json({ message: 'Error del servidor' });
-    }
+  db.get('SELECT * FROM users WHERE email = ?', [email]).then(result => {
+    const user = result.value();
 
     if (user) {
       return res.status(400).json({ message: 'El usuario ya existe' });
@@ -54,18 +52,20 @@ router.post('/register', [
 
     // Crear usuario
     db.run('INSERT INTO users (name, email, password) VALUES (?, ?, ?)', 
-      [name, email, hashedPassword], function(err) {
-      if (err) {
-        return res.status(500).json({ message: 'Error al crear usuario' });
-      }
-
-      const token = jwt.sign({ id: this.lastID, email, role: 'client' }, JWT_SECRET);
+      [{ name, email, password: hashedPassword }]).then(result => {
+      const token = jwt.sign({ id: result.lastID, email, role: 'client' }, JWT_SECRET);
       res.json({ 
         message: 'Usuario creado exitosamente',
         token,
-        user: { id: this.lastID, name, email, role: 'client' }
+        user: { id: result.lastID, name, email, role: 'client' }
       });
+    }).catch(err => {
+      console.error('Error creating user:', err);
+      res.status(500).json({ message: 'Error al crear usuario' });
     });
+  }).catch(err => {
+    console.error('Error checking user:', err);
+    res.status(500).json({ message: 'Error del servidor' });
   });
 });
 
@@ -82,10 +82,14 @@ router.post('/login', [
   const { email, password } = req.body;
 
   try {
+    console.log('Login attempt for email:', email);
     const result = await db.get('SELECT * FROM users WHERE email = ?', [email]);
+    console.log('Login result:', result);
     const user = result.value();
+    console.log('Login user:', user);
 
     if (!user || !bcrypt.compareSync(password, user.password)) {
+      console.log('Invalid credentials');
       return res.status(401).json({ message: 'Credenciales inválidas' });
     }
 
