@@ -584,6 +584,8 @@ async function deleteProduct(productId) {
 async function handleProductSubmit(e) {
     e.preventDefault();
     
+    console.log('Submitting product form...');
+    
     const productId = document.getElementById('productId').value;
     const isEdit = productId !== '';
     
@@ -596,9 +598,14 @@ async function handleProductSubmit(e) {
         category: document.getElementById('productCategory').value
     };
 
+    console.log('Product data:', productData);
+    console.log('Token:', localStorage.getItem('token'));
+
     try {
         const url = isEdit ? `/api/products/${productId}` : '/api/products';
         const method = isEdit ? 'PUT' : 'POST';
+        
+        console.log('Making request to:', url, 'with method:', method);
         
         const response = await fetch(url, {
             method: method,
@@ -609,7 +616,9 @@ async function handleProductSubmit(e) {
             body: JSON.stringify(productData)
         });
 
+        console.log('Response status:', response.status);
         const result = await response.json();
+        console.log('Response result:', result);
 
         if (response.ok) {
             showMessage(isEdit ? 'Producto actualizado exitosamente' : 'Producto creado exitosamente', 'success');
@@ -620,6 +629,7 @@ async function handleProductSubmit(e) {
             showMessage(result.message, 'error');
         }
     } catch (error) {
+        console.error('Error submitting product:', error);
         showMessage('Error al guardar producto', 'error');
     }
 }
