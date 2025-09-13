@@ -109,7 +109,7 @@ const initDatabase = () => {
           description: 'Ducha de lluvia con múltiples chorros y regulador de temperatura',
           price: 45000,
           stock: 8,
-          image_url: '/images/ducha-lluvia.jpg',
+          image_url: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=400&h=300&fit=crop&crop=center',
           category: 'Baño',
           created_at: new Date().toISOString()
         },
@@ -119,7 +119,7 @@ const initDatabase = () => {
           description: 'Lavamanos elegante de porcelana con grifo incluido',
           price: 35000,
           stock: 12,
-          image_url: '/images/lavamanos.jpg',
+          image_url: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400&h=300&fit=crop&crop=center',
           category: 'Baño',
           created_at: new Date().toISOString()
         },
@@ -129,7 +129,7 @@ const initDatabase = () => {
           description: 'Grifo de baño con acabado cromado y válvula de ahorro',
           price: 18000,
           stock: 20,
-          image_url: '/images/grifo-bano.jpg',
+          image_url: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=400&h=300&fit=crop&crop=center',
           category: 'Baño',
           created_at: new Date().toISOString()
         },
@@ -139,7 +139,7 @@ const initDatabase = () => {
           description: 'Set completo de accesorios para ducha con porta jabón',
           price: 12000,
           stock: 25,
-          image_url: '/images/accesorios-ducha.jpg',
+          image_url: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=400&h=300&fit=crop&crop=center',
           category: 'Accesorios',
           created_at: new Date().toISOString()
         }

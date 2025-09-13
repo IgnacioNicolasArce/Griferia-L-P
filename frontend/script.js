@@ -279,7 +279,8 @@ function renderProducts() {
         productCard.className = 'product-card';
         productCard.innerHTML = `
             <div class="product-image">
-                <i class="fas fa-tint"></i>
+                <img src="${product.image_url || 'https://via.placeholder.com/400x300/f8f9fa/6c757d?text=Sin+Imagen'}" alt="${product.name}" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                <i class="fas fa-tint" style="display: none;"></i>
             </div>
             <div class="product-info">
                 <h3 class="product-name">${product.name}</h3>
@@ -308,7 +309,8 @@ function viewProduct(productId) {
     productDetails.innerHTML = `
         <div class="product-detail">
             <div class="product-image">
-                <i class="fas fa-tint"></i>
+                <img src="${product.image_url || 'https://via.placeholder.com/400x300/f8f9fa/6c757d?text=Sin+Imagen'}" alt="${product.name}" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                <i class="fas fa-tint" style="display: none;"></i>
             </div>
             <div class="product-info">
                 <h2>${product.name}</h2>
@@ -804,7 +806,7 @@ function updateCartUI() {
     } else {
         cartItems.innerHTML = cart.map(item => `
             <div class="cart-item">
-                <img src="${item.image_url || '/images/placeholder.jpg'}" alt="${item.name}" class="cart-item-image">
+                <img src="${item.image_url || 'https://via.placeholder.com/100x100/f8f9fa/6c757d?text=Sin+Imagen'}" alt="${item.name}" class="cart-item-image">
                 <div class="cart-item-details">
                     <div class="cart-item-name">${item.name}</div>
                     <div class="cart-item-price">$${item.price.toLocaleString()}</div>
