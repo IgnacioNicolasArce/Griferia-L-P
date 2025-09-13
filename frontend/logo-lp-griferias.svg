@@ -1,0 +1,28 @@
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Fondo negro -->
+  <rect width="200" height="200" fill="#000000"/>
+  
+  <!-- Círculo blanco -->
+  <circle cx="100" cy="100" r="90" fill="#FFFFFF"/>
+  
+  <!-- Ícono de grifo estilizado -->
+  <!-- Base vertical del grifo -->
+  <rect x="70" y="40" width="16" height="40" fill="#000000" rx="2"/>
+  
+  <!-- Brazo horizontal del grifo -->
+  <rect x="86" y="70" width="40" height="12" fill="#000000" rx="2"/>
+  
+  <!-- Boquilla del grifo -->
+  <rect x="120" y="70" width="12" height="24" fill="#000000" rx="2"/>
+  
+  <!-- Gotas de agua cayendo -->
+  <ellipse cx="115" cy="100" rx="6" ry="8" fill="#000000"/>
+  <ellipse cx="125" cy="105" rx="5" ry="7" fill="#000000"/>
+  <ellipse cx="135" cy="100" rx="4" ry="6" fill="#000000"/>
+  
+  <!-- Texto L&P -->
+  <text x="100" y="130" text-anchor="middle" fill="#000000" font-family="Arial, sans-serif" font-size="28" font-weight="900">L&P</text>
+  
+  <!-- Texto GRIFERIAS -->
+  <text x="100" y="150" text-anchor="middle" fill="#000000" font-family="Arial, sans-serif" font-size="16" font-weight="700">GRIFERIAS</text>
+</svg>
