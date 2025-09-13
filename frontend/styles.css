@@ -60,15 +60,15 @@ body {
 }
 
 .logo-icon {
-    width: 60px;
-    height: 60px;
-    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    width: 70px;
+    height: 70px;
+    background: #1e3c72;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 3px solid #2a5298;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    border: 4px solid #2a5298;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
     transition: all 0.3s ease;
 }
 
@@ -78,9 +78,9 @@ body {
 }
 
 .faucet-icon {
-    width: 35px;
-    height: 35px;
-    color: white;
+    width: 45px;
+    height: 45px;
+    color: #2a5298;
     transition: all 0.3s ease;
 }
 
@@ -95,22 +95,24 @@ body {
 }
 
 .logo-main {
-    font-size: 2.2rem;
+    font-size: 2.4rem;
     font-weight: 900;
-    color: #1e3c72;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-    letter-spacing: 2px;
+    color: #2a5298;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+    letter-spacing: 3px;
     margin: 0;
+    font-family: 'Arial', sans-serif;
 }
 
 .logo-sub {
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     font-weight: 700;
     color: #2a5298;
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
-    letter-spacing: 3px;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+    letter-spacing: 4px;
     margin: 0;
-    margin-top: -2px;
+    margin-top: -3px;
+    font-family: 'Arial', sans-serif;
 }
 
 .nav-menu {
@@ -568,27 +570,27 @@ body {
 
     /* Logo responsivo */
     .logo {
-        gap: 10px;
+        gap: 12px;
     }
 
     .logo-icon {
-        width: 50px;
-        height: 50px;
+        width: 60px;
+        height: 60px;
     }
 
     .faucet-icon {
-        width: 28px;
-        height: 28px;
+        width: 35px;
+        height: 35px;
     }
 
     .logo-main {
-        font-size: 1.8rem;
-        letter-spacing: 1px;
+        font-size: 2rem;
+        letter-spacing: 2px;
     }
 
     .logo-sub {
-        font-size: 0.8rem;
-        letter-spacing: 2px;
+        font-size: 0.7rem;
+        letter-spacing: 3px;
     }
 
     .hero-content h2 {
@@ -1035,27 +1037,27 @@ body {
 
     /* Logo para pantallas muy pequeñas */
     .logo {
-        gap: 8px;
+        gap: 10px;
     }
 
     .logo-icon {
-        width: 45px;
-        height: 45px;
+        width: 50px;
+        height: 50px;
     }
 
     .faucet-icon {
-        width: 25px;
-        height: 25px;
+        width: 30px;
+        height: 30px;
     }
 
     .logo-main {
-        font-size: 1.5rem;
-        letter-spacing: 0.5px;
+        font-size: 1.6rem;
+        letter-spacing: 1px;
     }
 
     .logo-sub {
-        font-size: 0.7rem;
-        letter-spacing: 1px;
+        font-size: 0.6rem;
+        letter-spacing: 2px;
     }
 }
 
