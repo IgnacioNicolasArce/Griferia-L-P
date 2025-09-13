@@ -60,14 +60,14 @@ body {
 }
 
 .logo-icon {
-    width: 70px;
-    height: 70px;
-    background: white;
+    width: 80px;
+    height: 80px;
+    background: #1e3c72;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 3px solid white;
+    border: 3px solid #2a5298;
     box-shadow: 0 4px 15px rgba(0,0,0,0.3);
     transition: all 0.3s ease;
 }
@@ -78,42 +78,36 @@ body {
 }
 
 .faucet-icon {
-    width: 45px;
-    height: 45px;
-    color: #1e3c72;
+    width: 70px;
+    height: 70px;
+    color: white;
     transition: all 0.3s ease;
+}
+
+.logo-text-main {
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 900;
+    fill: white;
+    text-anchor: middle;
+    dominant-baseline: middle;
+}
+
+.logo-text-sub {
+    font-family: Arial, sans-serif;
+    font-size: 8px;
+    font-weight: 700;
+    fill: white;
+    text-anchor: middle;
+    dominant-baseline: middle;
+    letter-spacing: 1px;
 }
 
 .logo:hover .faucet-icon {
     transform: rotate(5deg);
 }
 
-.logo-text {
-    display: flex;
-    flex-direction: column;
-    line-height: 1;
-}
-
-.logo-main {
-    font-size: 2.4rem;
-    font-weight: 900;
-    color: white;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-    letter-spacing: 3px;
-    margin: 0;
-    font-family: 'Arial', sans-serif;
-}
-
-.logo-sub {
-    font-size: 0.8rem;
-    font-weight: 700;
-    color: white;
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-    letter-spacing: 4px;
-    margin: 0;
-    margin-top: -3px;
-    font-family: 'Arial', sans-serif;
-}
+/* Los estilos del texto ahora están dentro del SVG */
 
 .nav-menu {
     display: flex;
@@ -574,27 +568,23 @@ body {
     }
 
     .logo-icon {
-        width: 60px;
-        height: 60px;
-        background: white;
+        width: 70px;
+        height: 70px;
+        background: #1e3c72;
     }
 
     .faucet-icon {
-        width: 35px;
-        height: 35px;
-        color: #1e3c72;
-    }
-
-    .logo-main {
-        font-size: 2rem;
-        letter-spacing: 2px;
+        width: 60px;
+        height: 60px;
         color: white;
     }
 
-    .logo-sub {
-        font-size: 0.7rem;
-        letter-spacing: 3px;
-        color: white;
+    .logo-text-main {
+        font-size: 12px;
+    }
+
+    .logo-text-sub {
+        font-size: 7px;
     }
 
     .hero-content h2 {
@@ -1045,27 +1035,23 @@ body {
     }
 
     .logo-icon {
-        width: 50px;
-        height: 50px;
-        background: white;
+        width: 60px;
+        height: 60px;
+        background: #1e3c72;
     }
 
     .faucet-icon {
-        width: 30px;
-        height: 30px;
-        color: #1e3c72;
-    }
-
-    .logo-main {
-        font-size: 1.6rem;
-        letter-spacing: 1px;
+        width: 50px;
+        height: 50px;
         color: white;
     }
 
-    .logo-sub {
-        font-size: 0.6rem;
-        letter-spacing: 2px;
-        color: white;
+    .logo-text-main {
+        font-size: 10px;
+    }
+
+    .logo-text-sub {
+        font-size: 6px;
     }
 }
 
