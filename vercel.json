@@ -11,12 +11,20 @@
     {
       "src": "frontend/**/*",
       "use": "@vercel/static"
+    },
+    {
+      "src": "public/**/*",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
     {
       "src": "/api/(.*)",
       "dest": "/backend/server.js"
+    },
+    {
+      "src": "/logo-lp-griferias.svg",
+      "dest": "/public/logo-lp-griferias.svg"
     },
     {
       "src": "/(.*)",
