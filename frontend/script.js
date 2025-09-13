@@ -25,6 +25,10 @@ const cartCount = document.getElementById('cartCount');
 const cartTotal = document.getElementById('cartTotal');
 const checkoutBtn = document.getElementById('checkoutBtn');
 
+// Botón flotante del carrito para móviles
+const floatingCartBtn = document.getElementById('floatingCartBtn');
+const floatingCartCount = document.getElementById('floatingCartCount');
+
 // Formularios
 const loginForm = document.getElementById('loginForm');
 const registerForm = document.getElementById('registerForm');
@@ -60,6 +64,11 @@ function setupEventListeners() {
     cartClose.addEventListener('click', closeCart);
     cartOverlay.addEventListener('click', closeCart);
     checkoutBtn.addEventListener('click', handleCheckout);
+    
+    // Botón flotante del carrito para móviles
+    if (floatingCartBtn) {
+        floatingCartBtn.addEventListener('click', toggleCart);
+    }
 
     // Formularios
     loginForm.addEventListener('submit', handleLogin);
@@ -793,6 +802,11 @@ function updateCartUI() {
     // Actualizar contador del carrito
     const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
     cartCount.textContent = totalItems;
+    
+    // Actualizar contador del botón flotante
+    if (floatingCartCount) {
+        floatingCartCount.textContent = totalItems;
+    }
 
     // Actualizar lista de productos
     if (cart.length === 0) {
