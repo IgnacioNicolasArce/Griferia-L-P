@@ -64,6 +64,8 @@ body {
     height: 120px;
     border-radius: 50%;
     object-fit: cover;
+    object-position: center;
+    transform: scale(1.2);
     transition: all 0.3s ease;
     border: none;
     outline: none;
@@ -72,7 +74,7 @@ body {
 }
 
 .logo:hover .logo-image {
-    transform: scale(1.05);
+    transform: scale(1.25);
     box-shadow: 0 6px 20px rgba(0,0,0,0.3);
 }
 
