@@ -23,7 +23,8 @@ const cartClose = document.getElementById('cartClose');
 const cartItems = document.getElementById('cartPanelItems'); // Panel del carrito
 const cartModalItems = document.getElementById('cartModalItems'); // Modal del carrito
 const cartCount = document.getElementById('cartCount');
-const cartTotal = document.getElementById('cartTotal');
+const cartModalTotal = document.getElementById('cartModalTotal');
+const cartPanelTotal = document.getElementById('cartPanelTotal');
 const checkoutBtn = document.getElementById('checkoutBtn');
 
 // Botón flotante del carrito para móviles
@@ -797,8 +798,11 @@ function updateCartUI() {
 
     // Actualizar total
     const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    if (cartTotal) {
-        cartTotal.textContent = total.toLocaleString();
+    if (cartModalTotal) {
+        cartModalTotal.textContent = total.toLocaleString();
+    }
+    if (cartPanelTotal) {
+        cartPanelTotal.textContent = total.toLocaleString();
     }
 }
 
