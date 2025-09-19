@@ -48,18 +48,50 @@ function writeDB(data) {
       fs.mkdirSync(dir, { recursive: true });
     }
     
-    // Escribir el archivo
-    fs.writeFileSync(dbPath, JSON.stringify(data, null, 2));
-    console.log('Database written successfully to:', dbPath);
+    // Crear una copia de respaldo antes de escribir
+    if (fs.existsSync(dbPath)) {
+      const backupPath = dbPath + '.backup';
+      fs.copyFileSync(dbPath, backupPath);
+      console.log('Backup created at:', backupPath);
+    }
     
-    // Verificar que se escribió correctamente
-    const writtenData = fs.readFileSync(dbPath, 'utf8');
-    console.log('Verification - written data:', writtenData);
+    // Escribir el archivo con modo de escritura atómica
+    const tempPath = dbPath + '.tmp';
+    fs.writeFileSync(tempPath, JSON.stringify(data, null, 2), 'utf8');
+    
+    // Verificar que el archivo temporal se escribió correctamente
+    const tempData = fs.readFileSync(tempPath, 'utf8');
+    const parsedTempData = JSON.parse(tempData);
+    
+    // Solo reemplazar el archivo original si la escritura fue exitosa
+    if (JSON.stringify(parsedTempData) === JSON.stringify(data)) {
+      fs.renameSync(tempPath, dbPath);
+      console.log('Database written successfully to:', dbPath);
+      
+      // Verificar que se escribió correctamente
+      const writtenData = fs.readFileSync(dbPath, 'utf8');
+      const parsedWrittenData = JSON.parse(writtenData);
+      console.log('Verification successful - data integrity confirmed');
+    } else {
+      console.error('Data integrity check failed, keeping original file');
+      fs.unlinkSync(tempPath);
+    }
     
   } catch (error) {
     console.error('Error writing database:', error);
     console.error('Error details:', error.message);
     console.error('Stack trace:', error.stack);
+    
+    // Intentar restaurar desde el backup si existe
+    const backupPath = dbPath + '.backup';
+    if (fs.existsSync(backupPath)) {
+      try {
+        fs.copyFileSync(backupPath, dbPath);
+        console.log('Restored from backup due to write error');
+      } catch (restoreError) {
+        console.error('Failed to restore from backup:', restoreError);
+      }
+    }
   }
 }
 
@@ -77,22 +109,28 @@ const initDatabase = () => {
       let data = readDB();
       console.log('Current data:', data);
       
-      // Siempre crear los datos iniciales (para debug)
-      console.log('Creating initial data...');
+      // Solo crear datos iniciales si no existen
+      let needsUpdate = false;
       
-      // Crear usuario admin por defecto
-      const adminPassword = bcrypt.hashSync('admin123', 10);
-      data.users = [{
-        id: 1,
-        name: 'Admin',
-        email: 'admin@griferia.com',
-        password: adminPassword,
-        role: 'admin',
-        created_at: new Date().toISOString()
-      }];
+      // Crear usuario admin por defecto solo si no existe
+      if (!data.users || data.users.length === 0) {
+        console.log('Creating admin user...');
+        const adminPassword = bcrypt.hashSync('admin123', 10);
+        data.users = [{
+          id: 1,
+          name: 'Admin',
+          email: 'admin@griferia.com',
+          password: adminPassword,
+          role: 'admin',
+          created_at: new Date().toISOString()
+        }];
+        needsUpdate = true;
+      }
 
-      // Insertar productos de ejemplo
-      data.products = [
+      // Insertar productos de ejemplo solo si no existen
+      if (!data.products || data.products.length === 0) {
+        console.log('Creating initial products...');
+        data.products = [
         {
           id: 1,
           name: 'Grifo de Cocina Moderno',
@@ -144,10 +182,31 @@ const initDatabase = () => {
           created_at: new Date().toISOString()
         }
       ];
+        needsUpdate = true;
+      }
 
-      console.log('Data to write:', data);
-      writeDB(data);
-      console.log('Database initialized successfully with', data.products.length, 'products and', data.users.length, 'users');
+      // Inicializar otras tablas si no existen
+      if (!data.orders) {
+        data.orders = [];
+        needsUpdate = true;
+      }
+      if (!data.order_items) {
+        data.order_items = [];
+        needsUpdate = true;
+      }
+      if (!data.contacts) {
+        data.contacts = [];
+        needsUpdate = true;
+      }
+
+      // Solo escribir si hay cambios
+      if (needsUpdate) {
+        console.log('Data to write:', data);
+        writeDB(data);
+        console.log('Database initialized successfully with', data.products.length, 'products and', data.users.length, 'users');
+      } else {
+        console.log('Database already exists, no changes needed');
+      }
 
       resolve();
     } catch (error) {
@@ -233,8 +292,13 @@ const db = {
   run: (query, params = []) => {
     return new Promise((resolve) => {
       try {
+        console.log('DB RUN query:', query, 'params:', params);
         const data = readDB();
-        const [action, table] = query.split(' ');
+        const parts = query.split(' ');
+        const action = parts[0];
+        const table = parts[2];
+        
+        console.log('DB RUN action:', action, 'table:', table);
         
         if (action === 'INSERT') {
           const newId = getNextId(table, data);
@@ -246,15 +310,66 @@ const db = {
           if (!data[table]) data[table] = [];
           data[table].push(newItem);
           writeDB(data);
+          console.log('DB RUN INSERT success, new ID:', newId);
           
           resolve({ lastID: newId, changes: 1 });
         } else if (action === 'UPDATE') {
-          // Implementar UPDATE si es necesario
-          resolve({ changes: 1 });
+          // Parsear UPDATE table SET field = value WHERE condition
+          const setIndex = parts.indexOf('SET');
+          const whereIndex = parts.indexOf('WHERE');
+          
+          if (setIndex !== -1 && whereIndex !== -1) {
+            const field = parts[setIndex + 1];
+            const value = parts[setIndex + 3];
+            const whereField = parts[whereIndex + 1];
+            const whereValue = parts[whereIndex + 3] || params[0];
+            
+            console.log('DB RUN UPDATE:', { field, value, whereField, whereValue });
+            
+            if (!data[table]) data[table] = [];
+            const itemIndex = data[table].findIndex(item => item[whereField] == whereValue);
+            
+            if (itemIndex !== -1) {
+              data[table][itemIndex][field] = value;
+              writeDB(data);
+              console.log('DB RUN UPDATE success');
+              resolve({ changes: 1 });
+            } else {
+              console.log('DB RUN UPDATE item not found');
+              resolve({ changes: 0 });
+            }
+          } else {
+            console.log('DB RUN UPDATE invalid query format');
+            resolve({ changes: 0 });
+          }
         } else if (action === 'DELETE') {
-          // Implementar DELETE si es necesario
-          resolve({ changes: 1 });
+          // Parsear DELETE FROM table WHERE condition
+          const whereIndex = parts.indexOf('WHERE');
+          
+          if (whereIndex !== -1) {
+            const whereField = parts[whereIndex + 1];
+            const whereValue = parts[whereIndex + 3] || params[0];
+            
+            console.log('DB RUN DELETE:', { whereField, whereValue });
+            
+            if (!data[table]) data[table] = [];
+            const initialLength = data[table].length;
+            data[table] = data[table].filter(item => item[whereField] != whereValue);
+            const finalLength = data[table].length;
+            const changes = initialLength - finalLength;
+            
+            if (changes > 0) {
+              writeDB(data);
+              console.log('DB RUN DELETE success, removed', changes, 'items');
+            }
+            
+            resolve({ changes });
+          } else {
+            console.log('DB RUN DELETE invalid query format');
+            resolve({ changes: 0 });
+          }
         } else {
+          console.log('DB RUN unknown action:', action);
           resolve({ lastID: 0, changes: 0 });
         }
       } catch (error) {
