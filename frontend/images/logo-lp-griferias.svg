@@ -1,0 +1,12 @@
+<svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="100" height="100" fill="#000000"/>
+<circle cx="50" cy="50" r="45" fill="#ffffff"/>
+<path d="M35 20 L35 30 L30 35 L30 45 L35 40 L35 30" stroke="#000000" stroke-width="4" fill="none" stroke-linecap="round"/>
+<path d="M35 40 L35 50 L40 55 L40 65 L30 65 L30 55 L35 50" stroke="#000000" stroke-width="4" fill="none" stroke-linecap="round"/>
+<path d="M40 55 L40 65 L50 65 L55 70 L55 80 L45 80 L45 70 L50 65" stroke="#000000" stroke-width="4" fill="none" stroke-linecap="round"/>
+<circle cx="48" cy="85" r="3" fill="#000000"/>
+<circle cx="52" cy="88" r="2.5" fill="#000000"/>
+<circle cx="56" cy="85" r="2" fill="#000000"/>
+<text x="50" y="65" text-anchor="middle" fill="#000000" font-family="Arial" font-size="14" font-weight="900">L&P</text>
+<text x="50" y="78" text-anchor="middle" fill="#000000" font-family="Arial" font-size="8" font-weight="700">GRIFERIAS</text>
+</svg>
