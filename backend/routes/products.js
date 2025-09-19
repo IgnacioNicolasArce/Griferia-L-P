@@ -1,6 +1,6 @@
 const express = require('express');
 const { body, validationResult } = require('express-validator');
-const { db } = require('../models/database-render');
+const { db, writeDB } = require('../models/database-render');
 const { authenticateToken } = require('./auth');
 
 const router = express.Router();
@@ -56,44 +56,20 @@ router.post('/', authenticateToken, [
     const { name, description, price, stock, image_url, category } = req.body;
     console.log('Creating product:', { name, description, price, stock, image_url, category });
 
-    // Leer la base de datos directamente para crear
-    const fs = require('fs');
-    const path = require('path');
-    const dbPath = process.env.NODE_ENV === 'production' ? '/tmp/db.json' : path.join(__dirname, '../../database/db.json');
+    // Usar la función db.run para crear el producto
+    const result = await db.run(
+      'INSERT INTO products (name, description, price, stock, image_url, category, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      [name, description, parseFloat(price), parseInt(stock), image_url, category, new Date().toISOString()]
+    );
     
-    let data;
-    try {
-      data = JSON.parse(fs.readFileSync(dbPath, 'utf8'));
-    } catch (err) {
-      console.error('Error reading database:', err);
-      return res.status(500).json({ message: 'Error del servidor' });
-    }
-    
-    // Generar nuevo ID
-    const newId = data.products.length > 0 ? Math.max(...data.products.map(p => p.id)) + 1 : 1;
-    
-    // Crear el nuevo producto
-    const newProduct = {
-      id: newId,
-      name,
-      description,
-      price: parseFloat(price),
-      stock: parseInt(stock),
-      image_url,
-      category,
-      created_at: new Date().toISOString()
-    };
-    
-    // Agregar el producto a la base de datos
-    data.products.push(newProduct);
-    
-    // Guardar la base de datos
-    fs.writeFileSync(dbPath, JSON.stringify(data, null, 2));
-    console.log('Product created successfully with ID:', newId);
+    console.log('Product created successfully with ID:', result.lastID);
 
+    // Obtener el producto creado
+    const newProduct = await db.get('SELECT * FROM products WHERE id = ?', [result.lastID]);
+    
     res.status(201).json({ 
       message: 'Producto creado exitosamente',
-      product: newProduct
+      product: newProduct.value()
     });
   } catch (error) {
     console.error('Error al crear producto:', error);
@@ -123,39 +99,16 @@ router.put('/:id', authenticateToken, [
     console.log('Updating product ID:', id);
     console.log('Update data:', { name, description, price, stock, image_url, category });
 
-    // Leer la base de datos directamente para actualizar
-    const fs = require('fs');
-    const path = require('path');
-    const dbPath = process.env.NODE_ENV === 'production' ? '/tmp/db.json' : path.join(__dirname, '../../database/db.json');
+    // Usar la función db.run para actualizar el producto
+    const result = await db.run(
+      'UPDATE products SET name = ?, description = ?, price = ?, stock = ?, image_url = ?, category = ?, updated_at = ? WHERE id = ?',
+      [name, description, parseFloat(price), parseInt(stock), image_url, category, new Date().toISOString(), id]
+    );
     
-    let data;
-    try {
-      data = JSON.parse(fs.readFileSync(dbPath, 'utf8'));
-    } catch (err) {
-      console.error('Error reading database:', err);
-      return res.status(500).json({ message: 'Error del servidor' });
-    }
-    
-    // Buscar y actualizar el producto
-    const productIndex = data.products.findIndex(p => p.id == id);
-    if (productIndex === -1) {
+    if (result.changes === 0) {
       return res.status(404).json({ message: 'Producto no encontrado' });
     }
     
-    // Actualizar el producto
-    data.products[productIndex] = {
-      ...data.products[productIndex],
-      name,
-      description,
-      price: parseFloat(price),
-      stock: parseInt(stock),
-      image_url,
-      category,
-      updated_at: new Date().toISOString()
-    };
-    
-    // Guardar la base de datos
-    fs.writeFileSync(dbPath, JSON.stringify(data, null, 2));
     console.log('Product updated successfully');
 
     res.json({ message: 'Producto actualizado exitosamente' });
@@ -175,30 +128,13 @@ router.delete('/:id', authenticateToken, async (req, res) => {
     const { id } = req.params;
     console.log('Deleting product ID:', id);
 
-    // Leer la base de datos directamente para eliminar
-    const fs = require('fs');
-    const path = require('path');
-    const dbPath = process.env.NODE_ENV === 'production' ? '/tmp/db.json' : path.join(__dirname, '../../database/db.json');
+    // Usar la función db.run para eliminar el producto
+    const result = await db.run('DELETE FROM products WHERE id = ?', [id]);
     
-    let data;
-    try {
-      data = JSON.parse(fs.readFileSync(dbPath, 'utf8'));
-    } catch (err) {
-      console.error('Error reading database:', err);
-      return res.status(500).json({ message: 'Error del servidor' });
-    }
-    
-    // Buscar y eliminar el producto
-    const productIndex = data.products.findIndex(p => p.id == id);
-    if (productIndex === -1) {
+    if (result.changes === 0) {
       return res.status(404).json({ message: 'Producto no encontrado' });
     }
     
-    // Eliminar el producto
-    data.products.splice(productIndex, 1);
-    
-    // Guardar la base de datos
-    fs.writeFileSync(dbPath, JSON.stringify(data, null, 2));
     console.log('Product deleted successfully');
 
     res.json({ message: 'Producto eliminado exitosamente' });

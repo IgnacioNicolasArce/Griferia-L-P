@@ -352,7 +352,7 @@ function addToCart(productId) {
         return;
     }
 
-    const existingItem = cart.find(item => item.product_id === productId);
+    const existingItem = cart.find(item => item.id === productId);
     if (existingItem) {
         if (existingItem.quantity >= product.stock) {
             showMessage('No hay suficiente stock', 'error');
@@ -361,9 +361,10 @@ function addToCart(productId) {
         existingItem.quantity++;
     } else {
         cart.push({
-            product_id: productId,
+            id: product.id,
             name: product.name,
             price: product.price,
+            image_url: product.image_url,
             quantity: 1
         });
     }
@@ -374,7 +375,7 @@ function addToCart(productId) {
 
 
 function removeFromCart(productId) {
-    cart = cart.filter(item => item.product_id !== productId);
+    cart = cart.filter(item => item.id !== productId);
     updateCartUI();
     showMessage('Producto eliminado del carrito', 'success');
 }
@@ -720,27 +721,6 @@ function closeCart() {
     document.body.style.overflow = '';
 }
 
-// Función para agregar producto al carrito
-function addToCart(productId) {
-    const product = products.find(p => p.id == productId);
-    if (!product) return;
-
-    const existingItem = cart.find(item => item.id == productId);
-    if (existingItem) {
-        existingItem.quantity += 1;
-    } else {
-        cart.push({
-            id: product.id,
-            name: product.name,
-            price: product.price,
-            image_url: product.image_url,
-            quantity: 1
-        });
-    }
-
-    updateCartUI();
-    showMessage('Producto agregado al carrito', 'success');
-}
 
 // Función para remover producto del carrito
 function removeFromCart(productId) {
