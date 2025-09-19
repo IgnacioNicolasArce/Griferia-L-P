@@ -60,8 +60,8 @@ body {
 }
 
 .logo-image {
-    width: 80px;
-    height: 80px;
+    width: 120px;
+    height: 120px;
     border-radius: 50%;
     object-fit: contain;
     transition: all 0.3s ease;
@@ -987,8 +987,8 @@ body {
     }
 
     .logo-image {
-        width: 60px;
-        height: 60px;
+        width: 90px;
+        height: 90px;
     }
 }
 
