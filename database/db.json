@@ -1,0 +1,67 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "name": "Admin",
+      "email": "admin@griferia.com",
+      "password": "$2a$10$X97vX3UpXtmLrQFMKzEA/.OAPDQxz0I6GAVumKFp1IuIlbDTsn9cO",
+      "role": "admin",
+      "created_at": "2025-09-19T22:53:27.450Z"
+    }
+  ],
+  "products": [
+    {
+      "id": 1,
+      "name": "Grifo de Cocina Moderno",
+      "description": "Grifo de cocina con tecnología de ahorro de agua y diseño moderno",
+      "price": 25000,
+      "stock": 15,
+      "image_url": "data:image/jpeg;base64,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",
+      "category": "Cocina",
+      "created_at": "2025-09-19T22:53:27.450Z"
+    },
+    {
+      "id": 2,
+      "name": "Ducha de Lluvia",
+      "description": "Ducha de lluvia con múltiples chorros y regulador de temperatura",
+      "price": 45000,
+      "stock": 8,
+      "image_url": "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=400&h=300&fit=crop&crop=center",
+      "category": "Baño",
+      "created_at": "2025-09-19T22:53:27.450Z"
+    },
+    {
+      "id": 3,
+      "name": "Lavamanos de Pedestal",
+      "description": "Lavamanos elegante de porcelana con grifo incluido",
+      "price": 35000,
+      "stock": 12,
+      "image_url": "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400&h=300&fit=crop&crop=center",
+      "category": "Baño",
+      "created_at": "2025-09-19T22:53:27.450Z"
+    },
+    {
+      "id": 4,
+      "name": "Grifo de Baño",
+      "description": "Grifo de baño con acabado cromado y válvula de ahorro",
+      "price": 18000,
+      "stock": 20,
+      "image_url": "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=400&h=300&fit=crop&crop=center",
+      "category": "Baño",
+      "created_at": "2025-09-19T22:53:27.450Z"
+    },
+    {
+      "id": 5,
+      "name": "Accesorio de Ducha",
+      "description": "Set completo de accesorios para ducha con porta jabón",
+      "price": 12000,
+      "stock": 25,
+      "image_url": "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=400&h=300&fit=crop&crop=center",
+      "category": "Accesorios",
+      "created_at": "2025-09-19T22:53:27.450Z"
+    }
+  ],
+  "orders": [],
+  "order_items": [],
+  "contacts": []
+}
