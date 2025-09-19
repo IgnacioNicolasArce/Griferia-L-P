@@ -372,41 +372,6 @@ function addToCart(productId) {
     updateCartUI();
 }
 
-function updateCartUI() {
-    const cartItems = document.getElementById('cartItems');
-    const cartTotal = document.getElementById('cartTotal');
-    
-    cartItems.innerHTML = '';
-    
-    if (cart.length === 0) {
-        cartItems.innerHTML = '<p>El carrito está vacío</p>';
-        cartTotal.textContent = '0';
-        return;
-    }
-
-    let total = 0;
-    cart.forEach(item => {
-        const itemTotal = item.price * item.quantity;
-        total += itemTotal;
-        
-        const cartItem = document.createElement('div');
-        cartItem.className = 'cart-item';
-        cartItem.innerHTML = `
-            <div>
-                <h4>${item.name}</h4>
-                <p>Cantidad: ${item.quantity} - Precio: $${item.price.toLocaleString()}</p>
-            </div>
-            <div>
-                <button class="btn btn-danger btn-small" onclick="removeFromCart(${item.product_id})">
-                    Eliminar
-                </button>
-            </div>
-        `;
-        cartItems.appendChild(cartItem);
-    });
-
-    cartTotal.textContent = total.toLocaleString();
-}
 
 function removeFromCart(productId) {
     cart = cart.filter(item => item.product_id !== productId);
@@ -801,7 +766,9 @@ function updateCartQuantity(productId, newQuantity) {
 function updateCartUI() {
     // Actualizar contador del carrito
     const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-    cartCount.textContent = totalItems;
+    if (cartCount) {
+        cartCount.textContent = totalItems;
+    }
     
     // Actualizar contador del botón flotante
     if (floatingCartCount) {
