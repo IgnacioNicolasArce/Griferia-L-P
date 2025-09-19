@@ -20,7 +20,8 @@ const cartBtn = document.getElementById('cartBtn');
 const cartPanel = document.getElementById('cartPanel');
 const cartOverlay = document.getElementById('cartOverlay');
 const cartClose = document.getElementById('cartClose');
-const cartItems = document.getElementById('cartItems');
+const cartItems = document.getElementById('cartPanelItems'); // Panel del carrito
+const cartModalItems = document.getElementById('cartModalItems'); // Modal del carrito
 const cartCount = document.getElementById('cartCount');
 const cartTotal = document.getElementById('cartTotal');
 const checkoutBtn = document.getElementById('checkoutBtn');
@@ -755,39 +756,50 @@ function updateCartUI() {
         floatingCartCount.textContent = totalItems;
     }
 
-    // Actualizar lista de productos
-    if (cart.length === 0) {
-        cartItems.innerHTML = `
-            <div class="cart-empty">
-                <i class="fas fa-shopping-cart"></i>
-                <p>Tu carrito está vacío</p>
-            </div>
-        `;
-        checkoutBtn.style.display = 'none';
-    } else {
-        cartItems.innerHTML = cart.map(item => `
-            <div class="cart-item">
-                <img src="${item.image_url || 'https://via.placeholder.com/100x100/f8f9fa/6c757d?text=Sin+Imagen'}" alt="${item.name}" class="cart-item-image">
-                <div class="cart-item-details">
-                    <div class="cart-item-name">${item.name}</div>
-                    <div class="cart-item-price">$${item.price.toLocaleString()}</div>
-                    <div class="cart-item-quantity">
-                        <button class="quantity-btn" onclick="updateCartQuantity(${item.id}, ${item.quantity - 1})" ${item.quantity <= 1 ? 'disabled' : ''}>-</button>
-                        <input type="number" class="quantity-input" value="${item.quantity}" min="1" onchange="updateCartQuantity(${item.id}, parseInt(this.value))">
-                        <button class="quantity-btn" onclick="updateCartQuantity(${item.id}, ${item.quantity + 1})">+</button>
-                    </div>
+    // Crear HTML para los items del carrito
+    const cartItemsHTML = cart.length === 0 ? `
+        <div class="cart-empty">
+            <i class="fas fa-shopping-cart"></i>
+            <p>Tu carrito está vacío</p>
+        </div>
+    ` : cart.map(item => `
+        <div class="cart-item">
+            <img src="${item.image_url || 'https://via.placeholder.com/100x100/f8f9fa/6c757d?text=Sin+Imagen'}" alt="${item.name}" class="cart-item-image">
+            <div class="cart-item-details">
+                <div class="cart-item-name">${item.name}</div>
+                <div class="cart-item-price">$${item.price.toLocaleString()}</div>
+                <div class="cart-item-quantity">
+                    <button class="quantity-btn" onclick="updateCartQuantity(${item.id}, ${item.quantity - 1})" ${item.quantity <= 1 ? 'disabled' : ''}>-</button>
+                    <input type="number" class="quantity-input" value="${item.quantity}" min="1" onchange="updateCartQuantity(${item.id}, parseInt(this.value))">
+                    <button class="quantity-btn" onclick="updateCartQuantity(${item.id}, ${item.quantity + 1})">+</button>
                 </div>
-                <button class="cart-item-remove" onclick="removeFromCart(${item.id})">
-                    <i class="fas fa-trash"></i>
-                </button>
             </div>
-        `).join('');
-        checkoutBtn.style.display = 'block';
+            <button class="cart-item-remove" onclick="removeFromCart(${item.id})">
+                <i class="fas fa-trash"></i>
+            </button>
+        </div>
+    `).join('');
+
+    // Actualizar panel del carrito
+    if (cartItems) {
+        cartItems.innerHTML = cartItemsHTML;
+    }
+
+    // Actualizar modal del carrito
+    if (cartModalItems) {
+        cartModalItems.innerHTML = cartItemsHTML;
+    }
+
+    // Mostrar/ocultar botón de checkout
+    if (checkoutBtn) {
+        checkoutBtn.style.display = cart.length === 0 ? 'none' : 'block';
     }
 
     // Actualizar total
     const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    cartTotal.textContent = total.toLocaleString();
+    if (cartTotal) {
+        cartTotal.textContent = total.toLocaleString();
+    }
 }
 
 // Función para manejar el checkout
