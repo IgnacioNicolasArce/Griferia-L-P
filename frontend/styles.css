@@ -381,7 +381,9 @@ body {
     max-height: 80vh;
     position: relative;
     animation: slideIn 0.3s ease;
-    overflow-y: auto;
+    overflow-y: hidden;
+    display: flex;
+    flex-direction: column;
 }
 
 .close {
@@ -455,6 +457,7 @@ body {
     background: white;
     z-index: 10;
     padding-bottom: 1rem;
+    flex-shrink: 0;
 }
 
 .tab-btn {
@@ -486,6 +489,8 @@ body {
     overflow-y: auto;
     padding-right: 10px;
     margin-bottom: 1rem;
+    flex: 1;
+    min-height: 0;
 }
 
 #adminProductsList::-webkit-scrollbar {
