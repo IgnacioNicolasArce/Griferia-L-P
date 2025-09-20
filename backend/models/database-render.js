@@ -302,15 +302,24 @@ const db = {
         
         if (action === 'INSERT') {
           const newId = getNextId(table, data);
+          
+          // Para INSERT, crear el objeto directamente desde los parámetros
+          // Asumiendo que los parámetros vienen en el orden correcto
           const newItem = {
             id: newId,
-            ...params[0]
+            name: params[0],
+            description: params[1],
+            price: params[2],
+            stock: params[3],
+            image_url: params[4],
+            category: params[5],
+            created_at: params[6]
           };
           
           if (!data[table]) data[table] = [];
           data[table].push(newItem);
           writeDB(data);
-          console.log('DB RUN INSERT success, new ID:', newId);
+          console.log('DB RUN INSERT success, new ID:', newId, 'item:', newItem);
           
           resolve({ lastID: newId, changes: 1 });
         } else if (action === 'UPDATE') {

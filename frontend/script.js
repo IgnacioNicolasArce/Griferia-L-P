@@ -168,7 +168,7 @@ async function handleLogin(e) {
     const data = Object.fromEntries(formData);
 
     try {
-        const response = await fetch('/api/auth/login', {
+        const response = await fetch('http://localhost:3000/api/auth/login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -199,7 +199,7 @@ async function handleRegister(e) {
     const data = Object.fromEntries(formData);
 
     try {
-        const response = await fetch('/api/auth/register', {
+        const response = await fetch('http://localhost:3000/api/auth/register', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -237,7 +237,7 @@ function checkAuthStatus() {
     const token = localStorage.getItem('token');
     if (token) {
         // Verificar si el token es válido
-        fetch('/api/auth/profile', {
+        fetch('http://localhost:3000/api/auth/profile', {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -273,8 +273,20 @@ function updateUI() {
 // Productos
 async function loadProducts() {
     try {
-        const response = await fetch('/api/products');
-        products = await response.json();
+        const response = await fetch('http://localhost:3000/api/products');
+        const allProducts = await response.json();
+        
+        // Filtrar solo productos válidos (que tengan name, price, etc.)
+        products = allProducts.filter(product => 
+            product.name && 
+            product.price && 
+            product.stock !== undefined &&
+            !product['0'] // Excluir productos corruptos
+        );
+        
+        console.log('All products from API:', allProducts);
+        console.log('Valid products for store:', products);
+        
         renderProducts();
     } catch (error) {
         console.error('Error al cargar productos:', error);
@@ -407,7 +419,7 @@ async function handleCheckout() {
     };
 
     try {
-        const response = await fetch('/api/orders', {
+        const response = await fetch('http://localhost:3000/api/orders', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -438,7 +450,7 @@ async function handleContact(e) {
     const data = Object.fromEntries(formData);
 
     try {
-        const response = await fetch('/api/contact', {
+        const response = await fetch('http://localhost:3000/api/contact', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -482,13 +494,25 @@ function switchAdminTab(tab) {
 
 async function loadAdminProducts() {
     try {
-        const response = await fetch('/api/products', {
+        const response = await fetch('http://localhost:3000/api/products', {
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('token')}`
             }
         });
         const products = await response.json();
-        renderAdminProducts(products);
+        
+        // Filtrar solo productos válidos (que tengan name, price, etc.)
+        const validProducts = products.filter(product => 
+            product.name && 
+            product.price && 
+            product.stock !== undefined &&
+            !product['0'] // Excluir productos corruptos
+        );
+        
+        console.log('All products:', products);
+        console.log('Valid products:', validProducts);
+        
+        renderAdminProducts(validProducts);
     } catch (error) {
         console.error('Error al cargar productos:', error);
     }
@@ -539,7 +563,7 @@ async function deleteProduct(productId) {
     if (!confirm('¿Estás seguro de que quieres eliminar este producto?')) return;
 
     try {
-        const response = await fetch(`/api/products/${productId}`, {
+        const response = await fetch(`http://localhost:3000/api/products/${productId}`, {
             method: 'DELETE',
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -581,7 +605,7 @@ async function handleProductSubmit(e) {
     console.log('Token:', localStorage.getItem('token'));
 
     try {
-        const url = isEdit ? `/api/products/${productId}` : '/api/products';
+        const url = isEdit ? `http://localhost:3000/api/products/${productId}` : 'http://localhost:3000/api/products';
         const method = isEdit ? 'PUT' : 'POST';
         
         console.log('Making request to:', url, 'with method:', method);
@@ -615,7 +639,7 @@ async function handleProductSubmit(e) {
 
 async function loadAdminOrders() {
     try {
-        const response = await fetch('/api/orders/all', {
+        const response = await fetch('http://localhost:3000/api/orders/all', {
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('token')}`
             }

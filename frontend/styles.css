@@ -378,8 +378,10 @@ body {
     border-radius: 15px;
     width: 90%;
     max-width: 500px;
+    max-height: 80vh;
     position: relative;
     animation: slideIn 0.3s ease;
+    overflow-y: auto;
 }
 
 .close {
@@ -448,6 +450,11 @@ body {
     display: flex;
     margin-bottom: 2rem;
     border-bottom: 2px solid #e9ecef;
+    position: sticky;
+    top: 0;
+    background: white;
+    z-index: 10;
+    padding-bottom: 1rem;
 }
 
 .tab-btn {
@@ -474,6 +481,31 @@ body {
     display: block;
 }
 
+#adminProductsList {
+    max-height: 400px;
+    overflow-y: auto;
+    padding-right: 10px;
+    margin-bottom: 1rem;
+}
+
+#adminProductsList::-webkit-scrollbar {
+    width: 8px;
+}
+
+#adminProductsList::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+#adminProductsList::-webkit-scrollbar-thumb {
+    background: #4fc3f7;
+    border-radius: 4px;
+}
+
+#adminProductsList::-webkit-scrollbar-thumb:hover {
+    background: #29b6f6;
+}
+
 .admin-product-item {
     display: flex;
     justify-content: space-between;
@@ -482,6 +514,12 @@ body {
     border: 1px solid #e9ecef;
     border-radius: 8px;
     margin-bottom: 1rem;
+    background: white;
+    transition: box-shadow 0.2s ease;
+}
+
+.admin-product-item:hover {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
 .admin-product-info {
@@ -491,6 +529,31 @@ body {
 .admin-product-actions {
     display: flex;
     gap: 0.5rem;
+}
+
+#adminOrdersList {
+    max-height: 400px;
+    overflow-y: auto;
+    padding-right: 10px;
+    margin-bottom: 1rem;
+}
+
+#adminOrdersList::-webkit-scrollbar {
+    width: 8px;
+}
+
+#adminOrdersList::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+#adminOrdersList::-webkit-scrollbar-thumb {
+    background: #4fc3f7;
+    border-radius: 4px;
+}
+
+#adminOrdersList::-webkit-scrollbar-thumb:hover {
+    background: #29b6f6;
 }
 
 /* Animations */
@@ -561,6 +624,12 @@ body {
     .modal-content {
         margin: 10% auto;
         width: 95%;
+        max-height: 85vh;
+    }
+    
+    #adminProductsList,
+    #adminOrdersList {
+        max-height: 300px;
     }
 }
 
