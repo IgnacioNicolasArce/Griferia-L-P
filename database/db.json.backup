@@ -7,6 +7,22 @@
       "password": "$2a$10$X97vX3UpXtmLrQFMKzEA/.OAPDQxz0I6GAVumKFp1IuIlbDTsn9cO",
       "role": "admin",
       "created_at": "2025-09-19T22:53:27.450Z"
+    },
+    {
+      "id": 2,
+      "name": "ignacio aarce",
+      "email": "nachitoarce04@gmail.com",
+      "password": "$2a$10$w7JQ0R8mI1btZnJuVtKNcuouJrbn1ZFAGLAqZVQ3zexmdmTOIyTLO",
+      "role": "user",
+      "created_at": "2025-09-20T00:20:00.000Z"
+    },
+    {
+      "id": 3,
+      "name": "Ignacio",
+      "email": "nachitoarce04@gmail.com",
+      "password": "$2a$10$IGIeCeC.PbH.NmndkHvnrOZXAv8m86ou7svIryVXVci7Ic4H0DRwu",
+      "role": "user",
+      "created_at": "2025-09-20T00:21:00.000Z"
     }
   ],
   "products": [
