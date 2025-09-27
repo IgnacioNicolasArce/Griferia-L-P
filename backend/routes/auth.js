@@ -2,7 +2,7 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { body, validationResult } = require('express-validator');
-const { db } = require('../models/database-render');
+const { supabase } = require('../models/database-supabase');
 const config = require('../config');
 
 const router = express.Router();
@@ -31,7 +31,7 @@ router.post('/register', [
   body('name').notEmpty().withMessage('El nombre es requerido'),
   body('email').isEmail().withMessage('Email inválido'),
   body('password').isLength({ min: 6 }).withMessage('La contraseña debe tener al menos 6 caracteres')
-], (req, res) => {
+], async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
@@ -39,11 +39,15 @@ router.post('/register', [
 
   const { name, email, password } = req.body;
 
-  // Verificar si el usuario ya existe
-  db.get('SELECT * FROM users WHERE email = ?', [email]).then(result => {
-    const user = result.value();
+  try {
+    // Verificar si el usuario ya existe
+    const { data: existingUser } = await supabase
+      .from('users')
+      .select('*')
+      .eq('email', email)
+      .single();
 
-    if (user) {
+    if (existingUser) {
       return res.status(400).json({ message: 'El usuario ya existe' });
     }
 
@@ -51,22 +55,42 @@ router.post('/register', [
     const hashedPassword = bcrypt.hashSync(password, 10);
 
     // Crear usuario
-    db.run('INSERT INTO users (name, email, password) VALUES (?, ?, ?)', 
-      [{ name, email, password: hashedPassword }]).then(result => {
-      const token = jwt.sign({ id: result.lastID, email, role: 'client' }, JWT_SECRET);
-      res.json({ 
-        message: 'Usuario creado exitosamente',
-        token,
-        user: { id: result.lastID, name, email, role: 'client' }
-      });
-    }).catch(err => {
-      console.error('Error creating user:', err);
-      res.status(500).json({ message: 'Error al crear usuario' });
+    const { data: newUser, error } = await supabase
+      .from('users')
+      .insert({
+        name,
+        email,
+        password: hashedPassword,
+        role: 'client'
+      })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error creating user:', error);
+      return res.status(500).json({ message: 'Error al crear usuario' });
+    }
+
+    const token = jwt.sign({ 
+      id: newUser.id, 
+      email: newUser.email, 
+      role: newUser.role 
+    }, JWT_SECRET);
+
+    res.json({ 
+      message: 'Usuario creado exitosamente',
+      token,
+      user: { 
+        id: newUser.id, 
+        name: newUser.name, 
+        email: newUser.email, 
+        role: newUser.role 
+      }
     });
-  }).catch(err => {
-    console.error('Error checking user:', err);
+  } catch (err) {
+    console.error('Error in registration:', err);
     res.status(500).json({ message: 'Error del servidor' });
-  });
+  }
 });
 
 // Login de usuario
@@ -84,24 +108,18 @@ router.post('/login', [
   try {
     console.log('Login attempt for email:', email);
     
-    // Leer la base de datos directamente
-    const fs = require('fs');
-    const path = require('path');
-    const dbPath = process.env.NODE_ENV === 'production' ? '/tmp/db.json' : path.join(__dirname, '../../database/db.json');
-    
-    let data;
-    try {
-      data = JSON.parse(fs.readFileSync(dbPath, 'utf8'));
-    } catch (err) {
-      console.error('Error reading database:', err);
+    // Buscar usuario en Supabase
+    const { data: user, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('email', email)
+      .single();
+
+    if (error) {
+      console.error('Error finding user:', error);
       return res.status(500).json({ message: 'Error del servidor' });
     }
-    
-    console.log('Database data:', data);
-    const users = data.users || [];
-    console.log('Users:', users);
-    
-    const user = users.find(u => u.email === email);
+
     console.log('Found user:', user);
 
     if (!user || !bcrypt.compareSync(password, user.password)) {
@@ -109,11 +127,21 @@ router.post('/login', [
       return res.status(401).json({ message: 'Credenciales inválidas' });
     }
 
-    const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, JWT_SECRET);
+    const token = jwt.sign({ 
+      id: user.id, 
+      email: user.email, 
+      role: user.role 
+    }, JWT_SECRET);
+
     res.json({
       message: 'Login exitoso',
       token,
-      user: { id: user.id, name: user.name, email: user.email, role: user.role }
+      user: { 
+        id: user.id, 
+        name: user.name, 
+        email: user.email, 
+        role: user.role 
+      }
     });
   } catch (error) {
     console.error('Error en login:', error);

@@ -6,7 +6,7 @@ const { authenticateToken } = require('./routes/auth');
 const productRoutes = require('./routes/products');
 const orderRoutes = require('./routes/orders');
 const contactRoutes = require('./routes/contact');
-const { initDatabase } = require('./models/database-render');
+const { initDatabase, migrateFromJSON } = require('./models/database-supabase');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -28,17 +28,17 @@ app.get('/health', (req, res) => {
 // Ruta de debug para verificar la base de datos
 app.get('/debug', async (req, res) => {
   try {
-    const { db } = require('./models/database-render');
-    const products = await db.all('SELECT * FROM products');
-    const users = await db.all('SELECT * FROM users');
+    const { supabase } = require('./models/database-supabase');
+    const { data: products } = await supabase.from('products').select('*');
+    const { data: users } = await supabase.from('users').select('*');
     
     res.json({
       status: 'OK',
-      products: products,
-      users: users,
-      productsCount: products.length,
-      usersCount: users.length,
-      dbPath: process.env.NODE_ENV === 'production' ? '/tmp/db.json' : path.join(__dirname, '../../database/db.json')
+      products: products || [],
+      users: users || [],
+      productsCount: products?.length || 0,
+      usersCount: users?.length || 0,
+      database: 'Supabase'
     });
   } catch (error) {
     res.status(500).json({
@@ -54,17 +54,18 @@ app.get('/init-db', async (req, res) => {
     console.log('Forcing database initialization...');
     await initDatabase();
 
-    const { db } = require('./models/database-render');
-    const products = await db.all('SELECT * FROM products');
-    const users = await db.all('SELECT * FROM users');
+    const { supabase } = require('./models/database-supabase');
+    const { data: products } = await supabase.from('products').select('*');
+    const { data: users } = await supabase.from('users').select('*');
 
     res.json({
       status: 'SUCCESS',
       message: 'Database initialized successfully',
-      products: products,
-      users: users,
-      productsCount: products.length,
-      usersCount: users.length
+      products: products || [],
+      users: users || [],
+      productsCount: products?.length || 0,
+      usersCount: users?.length || 0,
+      database: 'Supabase'
     });
   } catch (error) {
     console.error('Error initializing database:', error);
@@ -78,14 +79,25 @@ app.get('/init-db', async (req, res) => {
 // Ruta para probar el login del admin
 app.post('/test-login', async (req, res) => {
   try {
-    const { db } = require('./models/database-render');
+    const { supabase } = require('./models/database-supabase');
     const email = 'admin@griferia.com';
     
     console.log('Testing admin login...');
-    const result = await db.get('SELECT * FROM users WHERE email = ?', [email]);
-    console.log('Test login result:', result);
-    const user = result.value();
-    console.log('Test login user:', user);
+    const { data: user, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('email', email)
+      .single();
+    
+    console.log('Test login result:', user);
+    
+    if (error) {
+      console.error('Error testing login:', error);
+      return res.status(500).json({
+        status: 'ERROR',
+        error: error.message
+      });
+    }
     
     res.json({
       status: 'SUCCESS',
@@ -96,6 +108,25 @@ app.post('/test-login', async (req, res) => {
     });
   } catch (error) {
     console.error('Error testing login:', error);
+    res.status(500).json({
+      status: 'ERROR',
+      error: error.message
+    });
+  }
+});
+
+// Ruta para migrar datos desde JSON
+app.post('/migrate-from-json', async (req, res) => {
+  try {
+    console.log('Starting migration from JSON...');
+    await migrateFromJSON();
+    
+    res.json({
+      status: 'SUCCESS',
+      message: 'Migration completed successfully'
+    });
+  } catch (error) {
+    console.error('Error during migration:', error);
     res.status(500).json({
       status: 'ERROR',
       error: error.message
@@ -116,8 +147,11 @@ app.get('*', (req, res) => {
 
 // Inicializar base de datos y servidor
 initDatabase().then(() => {
-  app.listen(PORT, () => {
+  app.listen(PORT, '0.0.0.0', () => {
     console.log(`🚀 Grifería L&P - Servidor corriendo en puerto ${PORT}`);
+    console.log(`📊 Base de datos: Supabase`);
+    console.log(`🌐 Accesible desde la red local en: http://192.168.0.37:${PORT}`);
+    console.log(`🔗 Accesible desde localhost en: http://localhost:${PORT}`);
   });
 }).catch(err => {
   console.error('Error al inicializar la base de datos:', err);

@@ -3,6 +3,15 @@ let currentUser = null;
 let cart = [];
 let products = [];
 
+// Configuración del API - detecta automáticamente la URL base
+const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+    ? 'http://localhost:3000' 
+    : `http://${window.location.hostname}:3000`;
+
+// Debug: mostrar la URL del API
+console.log('🌐 API Base URL:', API_BASE_URL);
+console.log('📍 Current hostname:', window.location.hostname);
+
 // Elementos del DOM
 const loginBtn = document.getElementById('loginBtn');
 const registerBtn = document.getElementById('registerBtn');
@@ -168,7 +177,7 @@ async function handleLogin(e) {
     const data = Object.fromEntries(formData);
 
     try {
-        const response = await fetch('http://localhost:3000/api/auth/login', {
+        const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -199,7 +208,7 @@ async function handleRegister(e) {
     const data = Object.fromEntries(formData);
 
     try {
-        const response = await fetch('http://localhost:3000/api/auth/register', {
+        const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -237,7 +246,7 @@ function checkAuthStatus() {
     const token = localStorage.getItem('token');
     if (token) {
         // Verificar si el token es válido
-        fetch('http://localhost:3000/api/auth/profile', {
+        fetch(`${API_BASE_URL}/api/auth/profile`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -273,7 +282,7 @@ function updateUI() {
 // Productos
 async function loadProducts() {
     try {
-        const response = await fetch('http://localhost:3000/api/products');
+        const response = await fetch(`${API_BASE_URL}/api/products`);
         const allProducts = await response.json();
         
         // Filtrar solo productos válidos (que tengan name, price, etc.)
@@ -419,7 +428,7 @@ async function handleCheckout() {
     };
 
     try {
-        const response = await fetch('http://localhost:3000/api/orders', {
+        const response = await fetch(`${API_BASE_URL}/api/orders`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -450,7 +459,7 @@ async function handleContact(e) {
     const data = Object.fromEntries(formData);
 
     try {
-        const response = await fetch('http://localhost:3000/api/contact', {
+        const response = await fetch(`${API_BASE_URL}/api/contact`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -494,7 +503,7 @@ function switchAdminTab(tab) {
 
 async function loadAdminProducts() {
     try {
-        const response = await fetch('http://localhost:3000/api/products', {
+        const response = await fetch(`${API_BASE_URL}/api/products`, {
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('token')}`
             }
@@ -563,7 +572,7 @@ async function deleteProduct(productId) {
     if (!confirm('¿Estás seguro de que quieres eliminar este producto?')) return;
 
     try {
-        const response = await fetch(`http://localhost:3000/api/products/${productId}`, {
+        const response = await fetch(`${API_BASE_URL}/api/products/${productId}`, {
             method: 'DELETE',
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -605,7 +614,7 @@ async function handleProductSubmit(e) {
     console.log('Token:', localStorage.getItem('token'));
 
     try {
-        const url = isEdit ? `http://localhost:3000/api/products/${productId}` : 'http://localhost:3000/api/products';
+        const url = isEdit ? `${API_BASE_URL}/api/products/${productId}` : `${API_BASE_URL}/api/products`;
         const method = isEdit ? 'PUT' : 'POST';
         
         console.log('Making request to:', url, 'with method:', method);
@@ -639,7 +648,7 @@ async function handleProductSubmit(e) {
 
 async function loadAdminOrders() {
     try {
-        const response = await fetch('http://localhost:3000/api/orders/all', {
+        const response = await fetch(`${API_BASE_URL}/api/orders/all`, {
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('token')}`
             }

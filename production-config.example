@@ -1,0 +1,19 @@
+# Configuración de Producción - Grifería L&P
+# Copia estas variables a tu plataforma de despliegue (Railway/Render)
+
+# Puerto (Railway/Render lo configuran automáticamente)
+PORT=3000
+
+# JWT Secret (cambia por una clave muy segura)
+JWT_SECRET=griferia_lp_jwt_secret_super_seguro_2024_production
+
+# Configuración de Email (Gmail recomendado)
+EMAIL_USER=tu_email@gmail.com
+EMAIL_PASS=tu_password_de_aplicacion_gmail
+
+# Supabase (ya configurado)
+SUPABASE_URL=https://elfgaqydhlulttrbthys.supabase.co
+SUPABASE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVsZmdhcXlkaGx1bHR0cmJ0aHlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkwMDgyODYsImV4cCI6MjA3NDU4NDI4Nn0.eDMW-E1nrCz5QE1KHCLGb40ZKM3ubMlm17F6kCruhqo
+
+# Configuración del servidor
+NODE_ENV=production

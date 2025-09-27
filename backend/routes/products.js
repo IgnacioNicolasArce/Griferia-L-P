@@ -1,6 +1,6 @@
 const express = require('express');
 const { body, validationResult } = require('express-validator');
-const { db, writeDB } = require('../models/database-render');
+const { supabase } = require('../models/database-supabase');
 const { authenticateToken } = require('./auth');
 
 const router = express.Router();
@@ -8,8 +8,17 @@ const router = express.Router();
 // Obtener todos los productos
 router.get('/', async (req, res) => {
   try {
-    const products = await db.all('SELECT * FROM products ORDER BY created_at DESC');
-    res.json(products);
+    const { data: products, error } = await supabase
+      .from('products')
+      .select('*')
+      .order('created_at', { ascending: false });
+    
+    if (error) {
+      console.error('Error al obtener productos:', error);
+      return res.status(500).json({ message: 'Error al obtener productos' });
+    }
+    
+    res.json(products || []);
   } catch (error) {
     console.error('Error al obtener productos:', error);
     res.status(500).json({ message: 'Error al obtener productos' });
@@ -22,8 +31,17 @@ router.get('/:id', async (req, res) => {
     const { id } = req.params;
     console.log('Getting product by ID:', id);
     
-    const result = await db.get('SELECT * FROM products WHERE id = ?', [id]);
-    const product = result.value();
+    const { data: product, error } = await supabase
+      .from('products')
+      .select('*')
+      .eq('id', id)
+      .single();
+    
+    if (error) {
+      console.error('Error al obtener producto:', error);
+      return res.status(500).json({ message: 'Error al obtener producto' });
+    }
+    
     console.log('Product found:', product);
     
     if (!product) {
@@ -56,20 +74,29 @@ router.post('/', authenticateToken, [
     const { name, description, price, stock, image_url, category } = req.body;
     console.log('Creating product:', { name, description, price, stock, image_url, category });
 
-    // Usar la función db.run para crear el producto
-    const result = await db.run(
-      'INSERT INTO products (name, description, price, stock, image_url, category, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
-      [name, description, parseFloat(price), parseInt(stock), image_url, category, new Date().toISOString()]
-    );
-    
-    console.log('Product created successfully with ID:', result.lastID);
+    const { data: newProduct, error } = await supabase
+      .from('products')
+      .insert({
+        name,
+        description,
+        price: parseFloat(price),
+        stock: parseInt(stock),
+        image_url,
+        category
+      })
+      .select()
+      .single();
 
-    // Obtener el producto creado
-    const newProduct = await db.get('SELECT * FROM products WHERE id = ?', [result.lastID]);
+    if (error) {
+      console.error('Error al crear producto:', error);
+      return res.status(500).json({ message: 'Error al crear producto' });
+    }
+    
+    console.log('Product created successfully:', newProduct);
     
     res.status(201).json({ 
       message: 'Producto creado exitosamente',
-      product: newProduct.value()
+      product: newProduct
     });
   } catch (error) {
     console.error('Error al crear producto:', error);
@@ -99,19 +126,36 @@ router.put('/:id', authenticateToken, [
     console.log('Updating product ID:', id);
     console.log('Update data:', { name, description, price, stock, image_url, category });
 
-    // Usar la función db.run para actualizar el producto
-    const result = await db.run(
-      'UPDATE products SET name = ?, description = ?, price = ?, stock = ?, image_url = ?, category = ?, updated_at = ? WHERE id = ?',
-      [name, description, parseFloat(price), parseInt(stock), image_url, category, new Date().toISOString(), id]
-    );
+    const { data: updatedProduct, error } = await supabase
+      .from('products')
+      .update({
+        name,
+        description,
+        price: parseFloat(price),
+        stock: parseInt(stock),
+        image_url,
+        category,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error al actualizar producto:', error);
+      return res.status(500).json({ message: 'Error al actualizar producto' });
+    }
     
-    if (result.changes === 0) {
+    if (!updatedProduct) {
       return res.status(404).json({ message: 'Producto no encontrado' });
     }
     
     console.log('Product updated successfully');
 
-    res.json({ message: 'Producto actualizado exitosamente' });
+    res.json({ 
+      message: 'Producto actualizado exitosamente',
+      product: updatedProduct
+    });
   } catch (error) {
     console.error('Error al actualizar producto:', error);
     res.status(500).json({ message: 'Error al actualizar producto' });
@@ -128,11 +172,14 @@ router.delete('/:id', authenticateToken, async (req, res) => {
     const { id } = req.params;
     console.log('Deleting product ID:', id);
 
-    // Usar la función db.run para eliminar el producto
-    const result = await db.run('DELETE FROM products WHERE id = ?', [id]);
-    
-    if (result.changes === 0) {
-      return res.status(404).json({ message: 'Producto no encontrado' });
+    const { error } = await supabase
+      .from('products')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      console.error('Error al eliminar producto:', error);
+      return res.status(500).json({ message: 'Error al eliminar producto' });
     }
     
     console.log('Product deleted successfully');

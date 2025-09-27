@@ -1,0 +1,8 @@
+# Configuración de Supabase
+# Copia este archivo como .env en la raíz del proyecto y configura tus valores
+
+SUPABASE_KEY=tu_supabase_key_aqui
+
+# Otras configuraciones
+PORT=3000
+NODE_ENV=development
