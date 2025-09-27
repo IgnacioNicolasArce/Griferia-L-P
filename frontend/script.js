@@ -6,7 +6,7 @@ let products = [];
 // Configuración del API - detecta automáticamente la URL base
 const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
     ? 'http://localhost:3000' 
-    : `http://${window.location.hostname}:3000`;
+    : window.location.origin; // Usa la misma URL base (sin puerto para Vercel)
 
 // Debug: mostrar la URL del API
 console.log('🌐 API Base URL:', API_BASE_URL);
