@@ -6,6 +6,8 @@ const { authenticateToken } = require('./routes/auth');
 const productRoutes = require('./routes/products');
 const orderRoutes = require('./routes/orders');
 const contactRoutes = require('./routes/contact');
+const paymentRoutes = require('./routes/payments');
+const { configureMercadoPago } = require('./config/mercadopago');
 const { initDatabase, migrateFromJSON } = require('./models/database-supabase');
 
 const app = express();
@@ -139,6 +141,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/contact', contactRoutes);
+app.use('/api/payments', paymentRoutes);
 
 // Ruta para servir la aplicación frontend
 app.get('*', (req, res) => {
@@ -147,9 +150,13 @@ app.get('*', (req, res) => {
 
 // Inicializar base de datos y servidor
 initDatabase().then(() => {
+  // Configurar Mercado Pago
+  configureMercadoPago();
+  
   app.listen(PORT, '0.0.0.0', () => {
     console.log(`🚀 Grifería L&P - Servidor corriendo en puerto ${PORT}`);
     console.log(`📊 Base de datos: Supabase`);
+    console.log(`💳 Mercado Pago: Configurado`);
     console.log(`🌐 Accesible desde la red local en: http://192.168.0.37:${PORT}`);
     console.log(`🔗 Accesible desde localhost en: http://localhost:${PORT}`);
   });

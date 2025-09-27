@@ -17,3 +17,10 @@ SUPABASE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZi
 
 # Configuración del servidor
 NODE_ENV=production
+
+# Mercado Pago (obtener desde https://www.mercadopago.com.ar/developers)
+MERCADOPAGO_ACCESS_TOKEN=TEST-123456789-abcdefghijklmnopqrstuvwxyz-12345678
+
+# URLs para redirección de pago (opcional)
+FRONTEND_URL=https://tu-app.vercel.app
+BACKEND_URL=https://tu-app.vercel.app

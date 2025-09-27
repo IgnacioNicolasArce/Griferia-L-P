@@ -52,6 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setupEventListeners();
     loadProducts();
     checkAuthStatus();
+    checkPaymentResult();
 });
 
 function initializeApp() {
@@ -839,8 +840,8 @@ function updateCartUI() {
     }
 }
 
-// Función para manejar el checkout
-function handleCheckout() {
+// Función para manejar el checkout con Mercado Pago
+async function handleCheckout() {
     if (!currentUser) {
         closeCart();
         showModal(loginModal);
@@ -853,10 +854,52 @@ function handleCheckout() {
         return;
     }
 
-    // Aquí puedes implementar la lógica de checkout
-    // Por ahora, solo mostramos un mensaje
-    showMessage('Funcionalidad de checkout en desarrollo', 'success');
-    console.log('Checkout:', cart);
+    // Solicitar dirección de envío
+    const shippingAddress = prompt('Ingresa tu dirección de envío:');
+    if (!shippingAddress) {
+        showMessage('La dirección de envío es requerida', 'error');
+        return;
+    }
+
+    try {
+        showMessage('Procesando pago...', 'info');
+        
+        // Preparar datos para el pago
+        const paymentData = {
+            items: cart.map(item => ({
+                name: item.name,
+                price: item.price,
+                quantity: item.quantity
+            })),
+            user_id: currentUser.id,
+            shipping_address: shippingAddress
+        };
+
+        console.log('Enviando datos de pago:', paymentData);
+
+        // Crear preferencia de pago
+        const response = await fetch(`${API_BASE_URL}/api/payments/create-preference`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+            },
+            body: JSON.stringify(paymentData)
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            // Redirigir a Mercado Pago
+            window.location.href = result.init_point;
+        } else {
+            showMessage(result.message || 'Error al procesar el pago', 'error');
+        }
+
+    } catch (error) {
+        console.error('Error en checkout:', error);
+        showMessage('Error al procesar el pago. Intenta nuevamente.', 'error');
+    }
 }
 
 // Función para obtener el total del carrito
@@ -868,5 +911,26 @@ function getCartTotal() {
 function clearCart() {
     cart = [];
     updateCartUI();
+}
+
+// Función para verificar resultado de pago desde URL
+function checkPaymentResult() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const status = urlParams.get('status');
+    const payment_id = urlParams.get('payment_id');
+
+    if (status && payment_id) {
+        // Limpiar URL
+        window.history.replaceState({}, document.title, window.location.pathname);
+
+        if (status === 'approved') {
+            showModal(document.getElementById('paymentSuccessModal'));
+            clearCart();
+        } else if (status === 'rejected') {
+            showModal(document.getElementById('paymentFailureModal'));
+        } else if (status === 'pending') {
+            showModal(document.getElementById('paymentPendingModal'));
+        }
+    }
 }
 

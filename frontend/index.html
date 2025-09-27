@@ -212,6 +212,54 @@
         <span class="floating-cart-count" id="floatingCartCount">0</span>
     </div>
 
+    <!-- Modal de resultado de pago exitoso -->
+    <div id="paymentSuccessModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="close" onclick="hideModal(document.getElementById('paymentSuccessModal'))">&times;</div>
+            <div style="text-align: center; padding: 2rem;">
+                <i class="fas fa-check-circle" style="font-size: 4rem; color: #28a745; margin-bottom: 1rem;"></i>
+                <h2>¡Pago Exitoso!</h2>
+                <p>Tu compra ha sido procesada correctamente.</p>
+                <p>Recibirás un email de confirmación en breve.</p>
+                <button class="btn btn-primary" onclick="hideModal(document.getElementById('paymentSuccessModal')); clearCart();">
+                    Continuar Comprando
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de resultado de pago fallido -->
+    <div id="paymentFailureModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="close" onclick="hideModal(document.getElementById('paymentFailureModal'))">&times;</div>
+            <div style="text-align: center; padding: 2rem;">
+                <i class="fas fa-times-circle" style="font-size: 4rem; color: #dc3545; margin-bottom: 1rem;"></i>
+                <h2>Pago Fallido</h2>
+                <p>No se pudo procesar tu pago.</p>
+                <p>Por favor, intenta nuevamente o contacta con soporte.</p>
+                <button class="btn btn-primary" onclick="hideModal(document.getElementById('paymentFailureModal'))">
+                    Intentar Nuevamente
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de pago pendiente -->
+    <div id="paymentPendingModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="close" onclick="hideModal(document.getElementById('paymentPendingModal'))">&times;</div>
+            <div style="text-align: center; padding: 2rem;">
+                <i class="fas fa-clock" style="font-size: 4rem; color: #ffc107; margin-bottom: 1rem;"></i>
+                <h2>Pago Pendiente</h2>
+                <p>Tu pago está siendo procesado.</p>
+                <p>Te notificaremos cuando se confirme.</p>
+                <button class="btn btn-primary" onclick="hideModal(document.getElementById('paymentPendingModal'))">
+                    Entendido
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script src="script.js"></script>
 </body>
 </html>
