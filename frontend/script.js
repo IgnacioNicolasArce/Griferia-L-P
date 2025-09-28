@@ -91,8 +91,7 @@ function setupEventListeners() {
     // Modales
     setupModalCloseListeners();
 
-    // Carrito
-    document.getElementById('checkoutBtn').addEventListener('click', handleCheckout);
+    // Checkout ya está configurado arriba
 
     // Admin
     document.getElementById('addProductBtn').addEventListener('click', () => {
@@ -842,7 +841,10 @@ function updateCartUI() {
 
 // Función para manejar el checkout (versión simplificada)
 async function handleCheckout() {
+    console.log('🚀 Iniciando checkout...');
+    
     if (!currentUser) {
+        console.log('❌ Usuario no autenticado');
         closeCart();
         showModal(loginModal);
         showMessage('Debes iniciar sesión para proceder al pago', 'error');
@@ -850,9 +852,12 @@ async function handleCheckout() {
     }
 
     if (cart.length === 0) {
+        console.log('❌ Carrito vacío');
         showMessage('Tu carrito está vacío', 'error');
         return;
     }
+
+    console.log('✅ Usuario autenticado y carrito con productos');
 
     // Solicitar dirección de envío
     const shippingAddress = prompt('Ingresa tu dirección de envío:');
@@ -861,11 +866,14 @@ async function handleCheckout() {
         return;
     }
 
+    console.log('✅ Dirección ingresada:', shippingAddress);
+
     try {
-        showMessage('Procesando pago...', 'info');
+        showMessage('Procesando pago...', 'success');
         
         // Calcular total
         const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        console.log('💰 Total calculado:', total);
         
         // Crear orden directamente
         const orderData = {
@@ -879,7 +887,7 @@ async function handleCheckout() {
             payment_method: 'mercadopago'
         };
 
-        console.log('Creando orden:', orderData);
+        console.log('📦 Creando orden:', orderData);
 
         // Crear orden en la base de datos
         const response = await fetch(`${API_BASE_URL}/api/orders`, {
@@ -891,7 +899,10 @@ async function handleCheckout() {
             body: JSON.stringify(orderData)
         });
 
+        console.log('📡 Respuesta del servidor:', response.status);
+
         const result = await response.json();
+        console.log('📋 Resultado:', result);
 
         if (response.ok) {
             // Limpiar carrito y mostrar éxito
@@ -907,11 +918,12 @@ async function handleCheckout() {
                 }
             }, 2000);
         } else {
+            console.error('❌ Error del servidor:', result);
             showMessage(result.message || 'Error al procesar la compra', 'error');
         }
 
     } catch (error) {
-        console.error('Error en checkout:', error);
+        console.error('❌ Error en checkout:', error);
         showMessage('Error al procesar el pago. Intenta nuevamente.', 'error');
     }
 }
