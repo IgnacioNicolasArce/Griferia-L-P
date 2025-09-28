@@ -97,6 +97,13 @@ function setupEventListeners() {
     if (checkoutForm) {
         checkoutForm.addEventListener('submit', handleCheckoutSubmit);
     }
+    
+    // Event listeners para métodos de pago
+    document.addEventListener('change', function(event) {
+        if (event.target.name === 'paymentMethod') {
+            console.log('💳 Método de pago seleccionado:', event.target.value);
+        }
+    });
 
     // Formularios
     loginForm.addEventListener('submit', handleLogin);
@@ -894,6 +901,13 @@ function showCheckoutModal() {
     const checkoutModal = document.getElementById('checkoutModal');
     const checkoutSummary = document.getElementById('checkoutSummary');
     const checkoutTotal = document.getElementById('checkoutTotal');
+    
+    // Verificar que los radio buttons estén presentes
+    const paymentMethods = document.querySelectorAll('input[name="paymentMethod"]');
+    console.log('🔍 Radio buttons encontrados:', paymentMethods.length);
+    paymentMethods.forEach((radio, index) => {
+        console.log(`📻 Radio ${index}:`, radio.value, radio.checked);
+    });
     
     // Llenar resumen del pedido
     checkoutSummary.innerHTML = '';
