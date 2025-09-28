@@ -91,6 +91,12 @@ function setupEventListeners() {
     if (floatingCartBtn) {
         floatingCartBtn.addEventListener('click', toggleCart);
     }
+    
+    // Formulario de checkout
+    const checkoutForm = document.getElementById('checkoutForm');
+    if (checkoutForm) {
+        checkoutForm.addEventListener('submit', handleCheckoutSubmit);
+    }
 
     // Formularios
     loginForm.addEventListener('submit', handleLogin);
@@ -864,8 +870,6 @@ function updateCartUI() {
 // Función para manejar el checkout (versión simplificada)
 async function handleCheckout(event) {
     console.log('🚀 Iniciando checkout...');
-    console.log('📍 Evento:', event);
-    console.log('📍 Elemento que disparó:', event.target);
     
     if (!currentUser) {
         console.log('❌ Usuario no autenticado');
@@ -881,39 +885,70 @@ async function handleCheckout(event) {
         return;
     }
 
-    console.log('✅ Usuario autenticado y carrito con productos');
+    // Mostrar modal de checkout
+    showCheckoutModal();
+}
 
-    // Solicitar dirección de envío
-    const shippingAddress = prompt('Ingresa tu dirección de envío:');
-    if (!shippingAddress) {
-        showMessage('La dirección de envío es requerida', 'error');
-        return;
-    }
+// Función para mostrar el modal de checkout
+function showCheckoutModal() {
+    const checkoutModal = document.getElementById('checkoutModal');
+    const checkoutSummary = document.getElementById('checkoutSummary');
+    const checkoutTotal = document.getElementById('checkoutTotal');
+    
+    // Llenar resumen del pedido
+    checkoutSummary.innerHTML = '';
+    let total = 0;
+    
+    cart.forEach(item => {
+        const itemTotal = item.price * item.quantity;
+        total += itemTotal;
+        
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'checkout-item';
+        itemDiv.innerHTML = `
+            <div class="checkout-item-info">
+                <img src="${item.image || '/images/logo.png'}" alt="${item.name}">
+                <div>
+                    <strong>${item.name}</strong>
+                    <div>Cantidad: ${item.quantity}</div>
+                </div>
+            </div>
+            <div class="checkout-item-price">
+                $${itemTotal.toLocaleString()}
+            </div>
+        `;
+        checkoutSummary.appendChild(itemDiv);
+    });
+    
+    checkoutTotal.textContent = total.toLocaleString();
+    showModal(checkoutModal);
+}
 
-    console.log('✅ Dirección ingresada:', shippingAddress);
-
+// Función para procesar el checkout
+async function processCheckout(formData) {
     try {
-        showMessage('Procesando pago...', 'success');
+        console.log('📦 Procesando checkout...');
         
         // Calcular total
         const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
         console.log('💰 Total calculado:', total);
-        
-        // Crear orden directamente
+
+        // Crear orden
         const orderData = {
             items: cart.map(item => ({
                 product_id: item.id,
                 quantity: item.quantity,
                 price: item.price
             })),
-            shipping_address: shippingAddress,
             total: total,
-            payment_method: 'mercadopago'
+            shipping_address: `${formData.street} ${formData.number}, ${formData.city}${formData.postalCode ? `, ${formData.postalCode}` : ''}`,
+            notes: formData.notes || '',
+            payment_method: formData.paymentMethod,
+            status: 'pending'
         };
 
-        console.log('📦 Creando orden:', orderData);
+        console.log('📋 Datos de la orden:', orderData);
 
-        // Crear orden en la base de datos
         const response = await fetch(`${API_BASE_URL}/api/orders`, {
             method: 'POST',
             headers: {
@@ -923,33 +958,142 @@ async function handleCheckout(event) {
             body: JSON.stringify(orderData)
         });
 
-        console.log('📡 Respuesta del servidor:', response.status);
+        if (!response.ok) {
+            throw new Error(`Error HTTP: ${response.status}`);
+        }
 
-        const result = await response.json();
-        console.log('📋 Resultado:', result);
+        const order = await response.json();
+        console.log('✅ Orden creada:', order);
 
-        if (response.ok) {
-            // Limpiar carrito y mostrar éxito
-            cart = [];
-            updateCartUI();
-            closeCart();
-            showMessage('¡Compra realizada exitosamente! Tu orden ha sido procesada.', 'success');
-            
-            // Simular redirección a Mercado Pago
-            setTimeout(() => {
-                if (confirm('¿Deseas ir a Mercado Pago para completar el pago?')) {
-                    window.open('https://www.mercadopago.com.ar/', '_blank');
-                }
-            }, 2000);
-        } else {
-            console.error('❌ Error del servidor:', result);
-            showMessage(result.message || 'Error al procesar la compra', 'error');
+        // Limpiar carrito
+        cart = [];
+        updateCartUI();
+        hideModal(document.getElementById('checkoutModal'));
+
+        // Procesar según método de pago
+        if (formData.paymentMethod === 'mercadopago') {
+            await processMercadoPagoPayment(order);
+        } else if (formData.paymentMethod === 'transfer') {
+            showTransferInstructions(order);
+        } else if (formData.paymentMethod === 'cash') {
+            showCashInstructions(order);
         }
 
     } catch (error) {
         console.error('❌ Error en checkout:', error);
-        showMessage('Error al procesar el pago. Intenta nuevamente.', 'error');
+        showMessage('Error al procesar la compra. Por favor, inténtalo de nuevo.', 'error');
     }
+}
+
+// Función para procesar pago con Mercado Pago
+async function processMercadoPagoPayment(order) {
+    try {
+        console.log('💳 Procesando pago con Mercado Pago...');
+        
+        const response = await fetch(`${API_BASE_URL}/api/payments/create-preference`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+            },
+            body: JSON.stringify({
+                orderId: order.id,
+                items: order.items,
+                total: order.total
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error(`Error HTTP: ${response.status}`);
+        }
+
+        const paymentData = await response.json();
+        console.log('✅ Datos de pago:', paymentData);
+
+        if (paymentData.init_point) {
+            // Redirigir a Mercado Pago
+            window.open(paymentData.init_point, '_blank');
+            showMessage('Redirigiendo a Mercado Pago para completar el pago...', 'success');
+        } else {
+            // Fallback si no hay init_point
+            showMessage(`¡Orden creada exitosamente!\n\nTotal: $${order.total.toLocaleString()}\n\nProcederás al pago con Mercado Pago.`, 'success');
+        }
+
+    } catch (error) {
+        console.error('❌ Error con Mercado Pago:', error);
+        showMessage('Error al procesar el pago. Por favor, contacta con soporte.', 'error');
+    }
+}
+
+// Función para mostrar instrucciones de transferencia
+function showTransferInstructions(order) {
+    const message = `
+        ¡Orden creada exitosamente!
+        
+        Total: $${order.total.toLocaleString()}
+        
+        Para completar tu compra, realiza una transferencia bancaria a:
+        
+        Banco: [Tu Banco]
+        CBU: [Tu CBU]
+        Alias: [Tu Alias]
+        
+        Referencia: Orden #${order.id}
+        
+        Una vez realizada la transferencia, contacta con nosotros para confirmar el pago.
+    `;
+    
+    showMessage(message, 'success');
+}
+
+// Función para mostrar instrucciones de pago en efectivo
+function showCashInstructions(order) {
+    const message = `
+        ¡Orden creada exitosamente!
+        
+        Total: $${order.total.toLocaleString()}
+        
+        Podrás pagar en efectivo cuando recibas el producto.
+        
+        Número de orden: #${order.id}
+        
+        Te contactaremos pronto para coordinar la entrega.
+    `;
+    
+    showMessage(message, 'success');
+}
+
+// Función para manejar el envío del formulario de checkout
+async function handleCheckoutSubmit(event) {
+    event.preventDefault();
+    
+    console.log('📝 Procesando formulario de checkout...');
+    
+    const formData = new FormData(event.target);
+    const data = {
+        street: formData.get('street'),
+        number: formData.get('number'),
+        city: formData.get('city'),
+        postalCode: formData.get('postalCode'),
+        notes: formData.get('notes'),
+        paymentMethod: formData.get('paymentMethod')
+    };
+    
+    console.log('📋 Datos del formulario:', data);
+    
+    // Validar datos requeridos
+    if (!data.street || !data.number || !data.city) {
+        showMessage('Por favor completa todos los campos requeridos', 'error');
+        return;
+    }
+    
+    if (!data.paymentMethod) {
+        showMessage('Por favor selecciona un método de pago', 'error');
+        return;
+    }
+    
+    // Procesar checkout
+    await processCheckout(data);
 }
 
 // Función para obtener el total del carrito

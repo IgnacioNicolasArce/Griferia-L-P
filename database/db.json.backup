@@ -23,6 +23,14 @@
       "password": "$2a$10$3rnJs/XZmOKOtJP193cqpetDWeB6rj0dE2CT3fBnesTG7I5guhRIW",
       "role": "client",
       "created_at": "2025-09-20T00:22:00.000Z"
+    },
+    {
+      "id": 5,
+      "name": {
+        "name": "pancho",
+        "email": "arceignacionico@gmail.com",
+        "password": "$2a$10$4DfCs0OYihl7rXz7TOmv/evQuihPS49NLgguEtxOJdwQW8Gm1.kIK"
+      }
     }
   ],
   "products": [

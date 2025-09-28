@@ -260,6 +260,101 @@
         </div>
     </div>
 
+    <!-- Modal de Checkout -->
+    <div id="checkoutModal" class="modal" style="display: none;">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="close" onclick="hideModal(document.getElementById('checkoutModal'))">&times;</div>
+            <h2>Finalizar Compra</h2>
+            
+            <form id="checkoutForm">
+                <!-- Información de Envío -->
+                <div class="form-section">
+                    <h3><i class="fas fa-truck"></i> Información de Envío</h3>
+                    
+                    <div class="form-group">
+                        <label for="street">Calle:</label>
+                        <input type="text" id="street" name="street" required placeholder="Nombre de la calle">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="number">Número:</label>
+                        <input type="text" id="number" name="number" required placeholder="123">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="city">Ciudad:</label>
+                        <input type="text" id="city" name="city" required placeholder="Buenos Aires">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="postalCode">Código Postal:</label>
+                        <input type="text" id="postalCode" name="postalCode" placeholder="1234">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="notes">Notas adicionales:</label>
+                        <textarea id="notes" name="notes" rows="3" placeholder="Instrucciones especiales para la entrega"></textarea>
+                    </div>
+                </div>
+
+                <!-- Método de Pago -->
+                <div class="form-section">
+                    <h3><i class="fas fa-credit-card"></i> Método de Pago</h3>
+                    
+                    <div class="payment-methods">
+                        <div class="payment-option">
+                            <input type="radio" id="payment_mercadopago" name="paymentMethod" value="mercadopago" checked>
+                            <label for="payment_mercadopago">
+                                <i class="fas fa-credit-card"></i>
+                                <strong>Mercado Pago</strong>
+                                <span>Pago con tarjeta, transferencia o efectivo</span>
+                            </label>
+                        </div>
+                        
+                        <div class="payment-option">
+                            <input type="radio" id="payment_transfer" name="paymentMethod" value="transfer">
+                            <label for="payment_transfer">
+                                <i class="fas fa-university"></i>
+                                <strong>Transferencia Bancaria</strong>
+                                <span>Transferencia directa a nuestra cuenta</span>
+                            </label>
+                        </div>
+                        
+                        <div class="payment-option">
+                            <input type="radio" id="payment_cash" name="paymentMethod" value="cash">
+                            <label for="payment_cash">
+                                <i class="fas fa-money-bill-wave"></i>
+                                <strong>Efectivo</strong>
+                                <span>Pago en efectivo al recibir el producto</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Resumen del Pedido -->
+                <div class="form-section">
+                    <h3><i class="fas fa-shopping-bag"></i> Resumen del Pedido</h3>
+                    <div id="checkoutSummary">
+                        <!-- Se llenará dinámicamente -->
+                    </div>
+                    <div class="order-total">
+                        <strong>Total: $<span id="checkoutTotal">0</span></strong>
+                    </div>
+                </div>
+
+                <!-- Botones -->
+                <div class="checkout-actions">
+                    <button type="button" class="btn btn-secondary" onclick="hideModal(document.getElementById('checkoutModal'))">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-check"></i> Confirmar Compra
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script src="script.js"></script>
 </body>
 </html>
