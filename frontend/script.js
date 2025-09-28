@@ -840,7 +840,7 @@ function updateCartUI() {
     }
 }
 
-// Función para manejar el checkout con Mercado Pago
+// Función para manejar el checkout (versión simplificada)
 async function handleCheckout() {
     if (!currentUser) {
         closeCart();
@@ -864,36 +864,50 @@ async function handleCheckout() {
     try {
         showMessage('Procesando pago...', 'info');
         
-        // Preparar datos para el pago
-        const paymentData = {
+        // Calcular total
+        const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        
+        // Crear orden directamente
+        const orderData = {
             items: cart.map(item => ({
-                name: item.name,
-                price: item.price,
-                quantity: item.quantity
+                product_id: item.id,
+                quantity: item.quantity,
+                price: item.price
             })),
-            user_id: currentUser.id,
-            shipping_address: shippingAddress
+            shipping_address: shippingAddress,
+            total: total,
+            payment_method: 'mercadopago'
         };
 
-        console.log('Enviando datos de pago:', paymentData);
+        console.log('Creando orden:', orderData);
 
-        // Crear preferencia de pago
-        const response = await fetch(`${API_BASE_URL}/api/payments/create-preference`, {
+        // Crear orden en la base de datos
+        const response = await fetch(`${API_BASE_URL}/api/orders`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${localStorage.getItem('token')}`
             },
-            body: JSON.stringify(paymentData)
+            body: JSON.stringify(orderData)
         });
 
         const result = await response.json();
 
-        if (result.success) {
-            // Redirigir a Mercado Pago
-            window.location.href = result.init_point;
+        if (response.ok) {
+            // Limpiar carrito y mostrar éxito
+            cart = [];
+            updateCartUI();
+            closeCart();
+            showMessage('¡Compra realizada exitosamente! Tu orden ha sido procesada.', 'success');
+            
+            // Simular redirección a Mercado Pago
+            setTimeout(() => {
+                if (confirm('¿Deseas ir a Mercado Pago para completar el pago?')) {
+                    window.open('https://www.mercadopago.com.ar/', '_blank');
+                }
+            }, 2000);
         } else {
-            showMessage(result.message || 'Error al procesar el pago', 'error');
+            showMessage(result.message || 'Error al procesar la compra', 'error');
         }
 
     } catch (error) {

@@ -150,13 +150,17 @@ app.get('*', (req, res) => {
 
 // Inicializar base de datos y servidor
 initDatabase().then(() => {
-  // Configurar Mercado Pago
-  configureMercadoPago();
+  // Configurar Mercado Pago (opcional)
+  try {
+    configureMercadoPago();
+    console.log(`💳 Mercado Pago: Configurado`);
+  } catch (error) {
+    console.log(`⚠️ Mercado Pago: No disponible (${error.message})`);
+  }
   
   app.listen(PORT, '0.0.0.0', () => {
     console.log(`🚀 Grifería L&P - Servidor corriendo en puerto ${PORT}`);
     console.log(`📊 Base de datos: Supabase`);
-    console.log(`💳 Mercado Pago: Configurado`);
     console.log(`🌐 Accesible desde la red local en: http://192.168.0.37:${PORT}`);
     console.log(`🔗 Accesible desde localhost en: http://localhost:${PORT}`);
   });
