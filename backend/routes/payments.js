@@ -67,21 +67,26 @@ router.post('/create-preference', async (req, res) => {
 
         // Guardar orden en la base de datos (pendiente de pago)
         const orderData = {
-            user_id: user_id || null,
+            user_id: user_id || 1, // Usar ID 1 como fallback para usuarios no autenticados
             status: 'pending_payment',
             total: total,
             shipping_address: shipping_address || '',
             payment_method: 'mercadopago',
             payment_id: response.body.id,
-            external_reference: preference.external_reference,
-            items: JSON.stringify(items)
+            external_reference: preference.external_reference
         };
+
+        console.log('📦 Creando orden con datos:', orderData);
 
         const { data: order, error: orderError } = await supabase
             .from('orders')
             .insert(orderData)
             .select()
             .single();
+
+        if (orderError) {
+            console.error('❌ Error detallado creando orden:', orderError);
+        }
 
         if (orderError) {
             console.error('Error creando orden:', orderError);
