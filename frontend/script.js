@@ -703,8 +703,17 @@ function showMessage(message, type) {
 
 // Función para scroll suave personalizado
 function smoothScrollTo(targetId) {
+    // Validar que targetId no esté vacío y sea un selector válido
+    if (!targetId || targetId === '#' || targetId.length < 2) {
+        console.warn('Selector inválido:', targetId);
+        return;
+    }
+    
     const targetElement = document.querySelector(targetId);
-    if (!targetElement) return;
+    if (!targetElement) {
+        console.warn('Elemento no encontrado:', targetId);
+        return;
+    }
 
     const headerHeight = document.querySelector('.header').offsetHeight;
     const targetPosition = targetElement.offsetTop - headerHeight - 20; // 20px de margen adicional
@@ -728,6 +737,9 @@ function smoothScrollTo(targetId) {
 
 // Función para actualizar el enlace activo en la navegación
 function updateActiveNavLink(targetId) {
+    // Validar targetId
+    if (!targetId || targetId === '#') return;
+    
     // Remover clase activa de todos los enlaces
     document.querySelectorAll('.nav-link').forEach(link => {
         link.classList.remove('active');
