@@ -902,11 +902,24 @@ function showCheckoutModal() {
     const checkoutSummary = document.getElementById('checkoutSummary');
     const checkoutTotal = document.getElementById('checkoutTotal');
     
+    // Verificar que el modal y sus elementos estén presentes
+    console.log('🔍 Modal encontrado:', !!checkoutModal);
+    console.log('🔍 Summary encontrado:', !!checkoutSummary);
+    console.log('🔍 Total encontrado:', !!checkoutTotal);
+    
     // Verificar que los radio buttons estén presentes
     const paymentMethods = document.querySelectorAll('input[name="paymentMethod"]');
     console.log('🔍 Radio buttons encontrados:', paymentMethods.length);
     paymentMethods.forEach((radio, index) => {
         console.log(`📻 Radio ${index}:`, radio.value, radio.checked);
+    });
+    
+    // Verificar que las secciones del modal estén presentes
+    const formSections = document.querySelectorAll('#checkoutModal .form-section');
+    console.log('🔍 Secciones del formulario encontradas:', formSections.length);
+    formSections.forEach((section, index) => {
+        const title = section.querySelector('h3');
+        console.log(`📋 Sección ${index}:`, title ? title.textContent : 'Sin título');
     });
     
     // Llenar resumen del pedido

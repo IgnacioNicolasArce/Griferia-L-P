@@ -1077,8 +1077,8 @@ body {
 
 /* Formulario de Checkout */
 .form-section {
-    margin-bottom: 2rem;
-    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
     border: 1px solid #e0e0e0;
     border-radius: 8px;
     background: #f9f9f9;
@@ -1232,6 +1232,13 @@ body {
     border-radius: 4px;
 }
 
+/* Modal de checkout específico */
+#checkoutModal .modal-content {
+    max-height: 90vh;
+    overflow-y: auto;
+    max-width: 600px;
+}
+
 /* Responsive para checkout */
 @media (max-width: 768px) {
     .payment-option label {
@@ -1246,5 +1253,9 @@ body {
     .modal-content {
         margin: 1rem;
         max-width: calc(100% - 2rem);
+    }
+    
+    #checkoutModal .modal-content {
+        max-height: 95vh;
     }
 }
