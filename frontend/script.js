@@ -75,7 +75,17 @@ function setupEventListeners() {
     cartBtn.addEventListener('click', toggleCart);
     cartClose.addEventListener('click', closeCart);
     cartOverlay.addEventListener('click', closeCart);
+    
+    // Configurar botones de checkout
+    console.log('🔧 Configurando botón de checkout principal:', checkoutBtn);
     checkoutBtn.addEventListener('click', handleCheckout);
+    
+    // Botón de checkout del modal
+    const checkoutBtnModal = document.getElementById('checkoutBtnModal');
+    console.log('🔧 Configurando botón de checkout del modal:', checkoutBtnModal);
+    if (checkoutBtnModal) {
+        checkoutBtnModal.addEventListener('click', handleCheckout);
+    }
     
     // Botón flotante del carrito para móviles
     if (floatingCartBtn) {
@@ -852,8 +862,10 @@ function updateCartUI() {
 }
 
 // Función para manejar el checkout (versión simplificada)
-async function handleCheckout() {
+async function handleCheckout(event) {
     console.log('🚀 Iniciando checkout...');
+    console.log('📍 Evento:', event);
+    console.log('📍 Elemento que disparó:', event.target);
     
     if (!currentUser) {
         console.log('❌ Usuario no autenticado');
